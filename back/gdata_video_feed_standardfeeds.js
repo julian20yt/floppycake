@@ -6,6 +6,7 @@ const router = express.Router();
 
 
 class FeedsApiVideos {
+  
 
     static async convertViewsToNumber(viewsString) {
         const match = viewsString.match(/^(\d+(\.\d+)?)(k|m|b)$/i);
@@ -93,73 +94,71 @@ class FeedsApiVideos {
     }
     
 
-    static async handleSearchRequest(req) {
-        const query = req.query.q;
+    static async handleSearchRequest(req, directQuery = null) {
 
-        if (!query) {
+      // Log the query for debugging purposes
+      console.log('Search query:', directQuery || req.query.q);
+  
+      const query = directQuery || req.query.q;
+  
+      if (!query) {
           console.error("Missing query in the request body.");
           throw new Error('Missing query in the request body.');
-        }
-
-        const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
-        const apiUrl = 'https://www.googleapis.com/youtubei/v1/search';
-
-        const postData = {
-            query,
-            context: {
-                client: {
-                    clientName: 'TVHTML5',
-                    clientVersion: '7.20240701.16.00',
-                    hl: 'en',
-                    gl: 'US',
-                }
-            }
-        };
-
-        try {
-            const response = await axios.post(apiUrl, postData, {
-                headers: { 'Content-Type': 'application/json' },
-                params: { key: apiKey }
-            });
-
-            console.log("Raw response data:", JSON.stringify(response.data, null, 2));
-
-            let intermediateForm;
-            try {
-                intermediateForm = await this.convertToIntermediateForm(response.data);
-            } catch (convertError) {
-                console.error("Error converting API response to intermediate form:", convertError);
-                throw new Error('Failed to process API response.');
-            }
-
-            return intermediateForm;
-
-        } catch (error) {
-            console.error("Error fetching data from YouTube API:", error.message);
-            return [];
-        }
+      }
+  
+      const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
+      const apiUrl = 'https://www.googleapis.com/youtubei/v1/search';
+  
+      const postData = {
+          query,
+          context: {
+              client: {
+                  clientName: 'TVHTML5',
+                  clientVersion: '7.20240701.16.00',
+                  hl: 'en',
+                  gl: 'US',
+              }
+          }
+      };
+  
+      try {
+          const response = await axios.post(apiUrl, postData, {
+              headers: { 'Content-Type': 'application/json' },
+              params: { key: apiKey }
+          });
+  
+          // Log raw response data to the console for debugging purposes
+          console.log("Raw response data:", JSON.stringify(response.data, null, 2));
+  
+          // Ensure the logs directory exists, or create it
+          const logsDir = path.join(__dirname, 'logs');
+          if (!fs.existsSync(logsDir)) {
+              fs.mkdirSync(logsDir);
+          }
+  
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const logFilePath = path.join(logsDir, `search-response-${timestamp}.json`);
+  
+          fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2));
+  
+          let intermediateForm;
+          try {
+              intermediateForm = await this.convertToIntermediateForm(response.data);
+          } catch (convertError) {
+              console.error("Error converting API response to intermediate form:", convertError);
+              throw new Error('Failed to process API response.');
+          }
+  
+          return intermediateForm;
+  
+      } catch (error) {
+          console.error("Error fetching data from YouTube API:", error.message);
+          return [];
+      }
     }
 
-    static async handleBrowseRequest(req, res) {
-        const feedName = req.params.feedName || "most_popular";
-
-        const browseIdMap = {
-            "most_popular": "FEtopics",
-            "most_popular_Tech": "FEtech",
-            "most_popular_Games": "FEtopics_gaming",
-            "most_popular_Film": "FEtopics_movies",
-            "most_popular_News": "FEtopics_movies",
-            "most_popular_Sports": "FEtopics_movies" ,
-            "most_popular_Music": "FEtopics_music"  
-        };
-    
-        if (!browseIdMap[feedName] && feedName !== "most_popular_Sports") {
-            const errorMessage = `Invalid feed name: ${feedName}. Valid feed names are: ${Object.keys(browseIdMap).join(", ")}.`;
-            console.error(errorMessage);
-        }
-
-        const browseId = feedName !== "most_popular_Sports" ? browseIdMap[feedName] || "FEtopics" : null;
-
+    static async handleBrowseRequest(req, res, browseId) {
+ 
         const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
         const apiUrl = 'https://www.googleapis.com/youtubei/v1/browse';
 
@@ -218,10 +217,10 @@ class FeedsApiVideos {
                 }
             }
         };
-    
 
         postData.browseId = browseId;
-      
+    
+  
     
 
         try {
@@ -267,7 +266,7 @@ class FeedsApiVideos {
         const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
     
         if (Array.isArray(items)) {
-            for (const item of items) { // Use for...of to handle async properly
+            for (const item of items) {
                 const video = item.tileRenderer;
     
                 if (video) {
@@ -288,8 +287,13 @@ class FeedsApiVideos {
     
                     const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
                         || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "John Doe"; // Ensure author extraction works in different cases
+                        || "John Doe";
     
+                    const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+                        || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
+    
+
                     const videoData = {
                         id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
                         author: authorText,
@@ -299,7 +303,8 @@ class FeedsApiVideos {
                         updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
                         category: video.category || "Unknown Category",
                         categoryLabel: video.categoryLabel || "Unknown Category Label",
-                        seconds: formatteddurationText
+                        seconds: formatteddurationText,
+                        pfp: pfpUrl
                     };
     
                     videos.push(videoData);
@@ -345,6 +350,11 @@ class FeedsApiVideos {
 
               const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "John Doe";
 
+              const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+              || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+              || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
+
+
               const videoData = {
                 id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID", 
                 author: authorText  || "John Doe",
@@ -368,6 +378,7 @@ class FeedsApiVideos {
     }
 
     static async generateVideoTemplate(parsedVideoData) {
+      
 
         if (parsedVideoData == "null" || parsedVideoData == ' ' || parsedVideoData == null ) {
             return "";
@@ -383,6 +394,8 @@ class FeedsApiVideos {
         const duration = parsedVideoData.seconds || `0`;
 
         const author = parsedVideoData.author || `John Doe`;
+
+        const pfpURL = parsedVideoData.pfp || `null`;
 
     
         const videoTemplate = `
@@ -456,7 +469,7 @@ class FeedsApiVideos {
                       "$t": "http://gdata.youtube.com/feeds/api/users/WarnerBrosPictures"
                     },
                     "yt$userId": {
-                      "$t": "jmJDM5pRKbUlVIzDYYWb6g"
+                      "$t": "${pfpURL}"
                     }
                   }
                 ],
@@ -622,6 +635,7 @@ class FeedsApiVideos {
 
     static async generateVideoList(videosData) {
         const videoTemplates = []; 
+
         for (const videoData of videosData) {
             const videoTemplate = await this.generateVideoTemplate(videoData);
             videoTemplates.push(videoTemplate);
@@ -633,8 +647,65 @@ class FeedsApiVideos {
 
     static async getVideos(req, res) {
 
-        const videoData = await FeedsApiVideos.handleBrowseRequest(req, res);
+        const feedName = req.params.feedName || "most_popular";
+      
+  
+        const browseIdMap = {
+            "most_popular": "FEtopics",
+            "most_popular_Tech": "null",
+            "most_popular_Games": "FEtopics_gaming",
+            "most_popular_Film": "FEtopics_movies",
+            "most_popular_News": "null",
+            "most_popular_Sports": "null" ,
+            "most_popular_Music": "null",
+            "most_popular_Comedy": "null",
+            "most_popular_People": "null",
+            "most_popular_Trending": "null",
+            "most_popular_Entertainment": "null",
+            "most_popular_Howto": "null",
+            "most_popular_Howto": "null",
+            "most_popular_Education": "null",
+            "most_popular_Animals": "null",
+        };
 
+        if (!browseIdMap[feedName] && feedName !== "most_popular_Sports") {
+          const errorMessage = `Invalid feed name: ${feedName}. Valid feed names are: ${Object.keys(browseIdMap).join(", ")}.`;
+          console.error(errorMessage);
+        }
+
+        var browseId = browseIdMap[feedName] || "FEtopics";
+
+        let videoData;
+    
+        if (req.params.feedName === "most_popular_Tech") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Tech");
+        } else if (req.params.feedName === "most_popular_News") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 News");
+        } else if (req.params.feedName === "most_popular_Comedy") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Comedy");
+        } else if (req.params.feedName === "most_popular_People") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 People & Blogs");
+        } else if (req.params.feedName === "most_popular_Trending") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "YouTube Trending Videos 2025");
+        } else if (req.params.feedName === "most_popular_Music") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Music");
+        } else if (req.params.feedName === "most_popular_Sports") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Sports");
+        } else if (req.params.feedName === "most_popular_Film") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Film");
+        } else if (req.params.feedName === "most_popular_Entertainment") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "Entertaining Videos 2025");
+        } else if (req.params.feedName === "most_popular_Howto") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "Howto and Style 2025");
+        } else if (req.params.feedName === "most_popular_Education") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "Educational Videos For Adults");
+        } else if (req.params.feedName === "most_popular_Animals") {
+            videoData = await FeedsApiVideos.handleSearchRequest(req, "Pets and Animals 2025");
+        } else {
+            const browseId = browseIdMap[req.params.feedName] || "FEtopics"; 
+            videoData = await FeedsApiVideos.handleBrowseRequest(req, res, browseId);
+        }
+        
 
         if (videoData.length === 0) {
             return res.status(404).send("No videos found.");

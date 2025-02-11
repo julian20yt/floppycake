@@ -285,9 +285,12 @@ const oauthRouter = (app) => {
                 console.error('Error response data:', errorDetails);
     
                 if (errorType === 'authorization_pending') {
-                    const errorMessage = 'Authorization pending. Please authorize the device.';
-                    res.status(428).send(errorMessage);
-                    logErrorToFile(`Authorization pending. Waiting for user authorization.`);
+                    const errorResponse = {
+                        error: 'authorization_pending',
+                        error_description: 'Precondition Required'
+                    };
+            
+                    return res.status(428).json(errorResponse);
                 } else if (errorType === 'slow_down') {
                     console.log('Received slow_down error, retrying...');
                     const retryDelay = 5000; 
@@ -316,9 +319,12 @@ const oauthRouter = (app) => {
                     logErrorToFile(`Unexpected error: ${errorDescription}`);
                 }
             } else {
-                const errorMessage = 'Authorization pending. Please authorize the device.';
-                res.status(428).send(errorMessage);
-                logErrorToFile(`Authorization pending. Waiting for user authorization.`);
+                const errorResponse = {
+                    error: 'authorization_pending',
+                    error_description: 'Precondition Required'
+                };
+        
+                return res.status(428).json(errorResponse);
             }
         }
     });

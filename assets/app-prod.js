@@ -11181,6 +11181,7 @@
                 FLYTOTVAllMusic: "icon-music",
                 FLYTOTVmusic: "icon-music",
                 STmost_popular_Music: "icon-music",
+                STmost_popular_Trending: "icon-trends",
                 FLYTOTVgaming: "icon-gaming",
                 STmost_popular_Games: "icon-gaming",
                 FLYTOTVsports: "icon-sport",
@@ -11499,6 +11500,7 @@
             this.Dv();
             b(null)
         };
+
         d.FS = function(a, b) {
             this.xr();
             this.Xq.post("/o/oauth2/device/code", null, {
@@ -11510,58 +11512,45 @@
         };
 
         d.xS = function(a, b, c) {
-            this.uA(a.device_code, 1E3 * a.interval, c);
-            b(a.user_code)
+            console.log('d.xS called with:', a, b, c);  // Log the parameters
+            this.uA(a.device_code, 1E3 * a.expires_in, c);  // Call the uA function
+            console.log('Calling b with user_code:', a.user_code);  // Log the user_code being passed to b
+            b(a.user_code);  // Execute b with a.user_code
         };
 
-        d.uA = function(a, b, c) {
-            var e = {
-                client_id: "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com",
-                client_secret: "SboVhoG9s0rNafixCSGGKXAT",
-                code: a,
-                grant_type: "http://oauth.net/grant_type/device/1.0"
-            };
-            
-            this.Xq.post("/o/oauth2/token", null, e, f);
 
-            // Request to obtain the token from /o/oauth2/token
-            var f = w(function(response) {
-                // Pass the response data (e) to d.FT
-                this.FT(response, a, b, c);
-            }, this);
-        
-            // Post data to /o/oauth2/token
-     
+        d.uA = function(a, b, c) {
+
+            var e = {
+                    client_id: "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com",
+                    client_secret: "SboVhoG9s0rNafixCSGGKXAT",
+                    code: a,
+                    grant_type: "http://oauth.net/grant_type/device/1.0"
+                },
+
+                f = w(function(e) {
+                    this.FT(e, a, b, c)
+                }, this);
+
+
+            console.log("D.uA" + f)
+
+            this.Xq.post("/o/oauth2/token", null, e, f)
+
+            this.FT(e, a, b, c)
+
+            console.log("D.uA" + f)
         };
         
         d.FT = function(a, b, c, e) {
-            // Log the received data (a) to inspect it
-            console.log("Received data in FT:", a);
-        
-            // If there's an error in the response
-            if (a && a.error) {
-                if (a.error === "authorization_pending") {
-                    var errorMessage = 'Authorization pending. Please authorize the device.';
-                    res.status(428).send(errorMessage); // Send HTTP 428 Status (Precondition Required)
-                    console.log("Authorization pending. Waiting for user authorization."); // Log to console
-                } else {
-                    // Handle other errors, retry if it's a "slow_down" error
-                    if (a.error === "slow_down") {
-                        c *= 2; // Apply backoff (double the wait time)
-                    }
-                    // Retry the token exchange after the delay
-                    this.Fy = this.cm.setTimeout(function() {
-                        this.uA(b, c, e);
-                    }, c);
-                }
-            } else {
-                // No error - process the response normally
-                this.Jz(a.refresh_token);  // Refresh the token
-                this.Rz(a, e);  // Further processing
-        
-                // Log success when no error occurs
-                console.log("Token exchange successful. Refresh token: " + a.refresh_token); // Log success
-            }
+
+            console.log("aa" + JSON.stringify(a));
+
+
+            var f = "slow_down" == a.error;
+            "authorization_pending" == a.error || f ? (f && (c *= 2), this.Fy = this.cm.setTimeout(w(function() {
+                this.uA(b, c, e)
+            }, this), c)) : (this.Jz(a.refresh_token), this.Rz(a, e))
         };
         
         

@@ -277,33 +277,6 @@ class FeedsApiVideos {
                 "scheme": "http://gdata.youtube.com/schemas/2007/categories.cat"
                 }
             ],
-            "media$content": [
-                {
-                "url": "http://www.youtube.com/v/ufsrgE0BYf0?version=3&f=standard&app=youtube_gdata",
-                "type": "application/x-shockwave-flash",
-                "medium": "video",
-                "isDefault": "true",
-                "expression": "full",
-                "duration": 91,
-                "yt$format": 5
-                },
-                {
-                "url": "rtsp://v2.cache1.c.youtube.com/CiQLENy73wIaGwn9YQFNgCv7uRMYDSANFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp",
-                "type": "video/3gpp",
-                "medium": "video",
-                "expression": "full",
-                "duration": 91,
-                "yt$format": 1
-                },
-                {
-                "url": "rtsp://v2.cache1.c.youtube.com/CiQLENy73wIaGwn9YQFNgCv7uRMYESARFEgGUghzdGFuZGFyZAw=/0/0/0/video.3gp",
-                "type": "video/3gpp",
-                "medium": "video",
-                "expression": "full",
-                "duration": 91,
-                "yt$format": 6
-                }
-            ],
             "media$credit": [
                 {
                 "$t": "warnerbrospictures",

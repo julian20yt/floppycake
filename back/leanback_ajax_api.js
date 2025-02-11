@@ -9,10 +9,10 @@ router.get('/leanback_ajax', (req, res) => {
                 {
                     "title": "YouTube Trends",
                     "video_count": 4777,
-                    "gdata_list_id": "FLtrends",
+                    "gdata_list_id": "STmost_popular_Trending",
                     "icon": "trends",
-                    "gdata_url": "http://gdata.youtube.com/feeds/api/users/trends/favorites",
-                    "list_id": "FLeNZlh03MyUkjRlLFpVQxsg",
+                    "gdata_url": "http://gdata.youtube.com/standardfeeds/US/most_popular_Trending",
+                    "list_id": "LBpop,10,t,en_US",
                     "tab": "featured",
                     "thumbnail": "http://i1.ytimg.com/vi/6ravZzYKR34/hqdefault.jpg"
                 },
