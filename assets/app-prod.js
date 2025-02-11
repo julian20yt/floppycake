@@ -11518,39 +11518,70 @@
             b(a.user_code);  // Execute b with a.user_code
         };
 
-
         d.uA = function(a, b, c) {
-
             var e = {
-                    client_id: "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com",
-                    client_secret: "SboVhoG9s0rNafixCSGGKXAT",
-                    code: a,
-                    grant_type: "http://oauth.net/grant_type/device/1.0"
+                client_id: "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com",
+                client_secret: "SboVhoG9s0rNafixCSGGKXAT",
+                code: a,
+                grant_type: "http://oauth.net/grant_type/device/1.0"
+            };
+        
+            var f = w(function(e) {
+                this.FT(e, a, b, c);
+            }, this);
+        
+            console.log("D.uA: f before POST request", f);
+        
+            // Custom POST request using fetch
+            fetch("/o/oauth2/token", {
+                method: "POST",  // HTTP method
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"  // Content type
                 },
-
-                f = w(function(e) {
-                    this.FT(e, a, b, c)
-                }, this);
-
-
-            console.log("D.uA" + f)
-
-            this.Xq.post("/o/oauth2/token", null, e, f)
-
-            this.FT(e, a, b, c)
-
-            console.log("D.uA" + f)
+                body: new URLSearchParams(e)  // Convert e to a query string
+            })
+            .then(response => response.json())  // Parse JSON response
+            .then(data => {
+                // Handle the response
+                console.log("Response data:", data);
+                f(data);  // Call f with the response data
+            })
+            .catch(error => {
+                // Handle errors
+                console.error("Error with POST request:", error);
+            });
+        
+            console.log("D.uA: f after POST request", f);
         };
         
         d.FT = function(a, b, c, e) {
-
-            console.log("aa" + JSON.stringify(a));
-
-
+            console.log("FT called with a:", JSON.stringify(a));
+            console.log("FT called with b:", b);
+            console.log("FT called with c:", c);
+            console.log("FT called with e:", e);
+        
             var f = "slow_down" == a.error;
-            "authorization_pending" == a.error || f ? (f && (c *= 2), this.Fy = this.cm.setTimeout(w(function() {
-                this.uA(b, c, e)
-            }, this), c)) : (this.Jz(a.refresh_token), this.Rz(a, e))
+            console.log("Is 'slow_down' error? f =", f);
+        
+  
+            if ("authorization_pending" == a.error || a.error == "slow_down") {
+                console.log("Authorization pending or slow down detected. Adjusting logic.");
+                if (f) {
+                    console.log("Slow down error, doubling the interval for c:", c);
+                    c *= 2;
+                }
+        
+                // Set a simple timeout to retry the uA call after the adjusted interval
+                this.Fy = setTimeout(function() {
+                    console.log("Retrying uA with b:", b, ", c:", c, ", e:", e);
+                    this.uA(b, c, e); // Retry uA after the timeout
+                }.bind(this), 50000);
+                } else {
+                    console.log("Proceeding with Jz and Rz methods.");
+                    this.Jz(a.refresh_token);
+                    this.Rz(a, e);
+                }
+
         };
         
         
