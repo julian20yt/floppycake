@@ -118,13 +118,17 @@ class FeedsApiVideos {
             }
         };
 
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+  
         if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
+            headers['Authorization'] = `Bearer ${accessToken}`;
         }
-
+        
         try {
             const response = await axios.post(apiUrl, postData, {
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 params: { key: apiKey }
             });
 

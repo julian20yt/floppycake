@@ -99,6 +99,9 @@ class FeedsApiVideos {
       console.log('Search query:', directQuery || req.query.q);
   
       const query = directQuery || req.query.q;
+
+      const accessToken = req.query.access_token;
+
   
       if (!query) {
           console.error("Missing query in the request body.");
@@ -120,9 +123,17 @@ class FeedsApiVideos {
           }
       };
   
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (accessToken) {
+          headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
       try {
           const response = await axios.post(apiUrl, postData, {
-              headers: { 'Content-Type': 'application/json' },
+              headers: headers,
               params: { key: apiKey }
           });
   
@@ -217,17 +228,21 @@ class FeedsApiVideos {
             }
         };
 
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+  
         if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
+            headers['Authorization'] = `Bearer ${accessToken}`;
         }
-
+  
         postData.browseId = browseId;
 
 
     
         try {
             const response = await axios.post(apiUrl, postData, {
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 params: { key: apiKey }
             });
     

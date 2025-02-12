@@ -179,7 +179,7 @@ class FeedsApiVideos {
     
         try {
             const response = await axios.post(apiUrl, postData, {
-                headers,
+                headers: headers,
                 params: { key: apiKey }
             });
     
