@@ -11532,27 +11532,50 @@
         
             console.log("D.uA: f before POST request", f);
         
-            // Custom POST request using fetch
-            fetch("/o/oauth2/token", {
-                method: "POST",  // HTTP method
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"  // Content type
-                },
-                body: new URLSearchParams(e)  // Convert e to a query string
-            })
-            .then(response => response.json())  // Parse JSON response
-            .then(data => {
-                // Handle the response
-                console.log("Response data:", data);
-                f(data);  // Call f with the response data
-            })
-            .catch(error => {
-                // Handle errors
-                console.error("Error with POST request:", error);
-            });
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/o/oauth2/token", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+            xhr.onload = function () {
+                console.log("XHR onload triggered, status:", xhr.status);
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 428 || xhr.status === 429) {
+                    try {
+                        console.log("Raw response:", xhr.responseText); // Debugging
+                        var data = JSON.parse(xhr.responseText);
+                        console.log("Parsed response data:", data);
+                        if (typeof f === "function") {
+                            f(data);
+                        } else {
+                            console.error("Error: f is not a function");
+                        }
+                    } catch (error) {
+                        console.error("Error parsing JSON response:", error);
+                    }
+                } else {
+                    console.error("Request failed with status:", xhr.status);
+                }
+            };
+        
+            xhr.onerror = function () {
+                console.error("XHR request encountered an error.");
+            };
+        
+            xhr.ontimeout = function () {
+                console.error("XHR request timed out.");
+            };
+        
+            var formData = [];
+            for (var key in e) {
+                if (e.hasOwnProperty(key)) {
+                    formData.push(encodeURIComponent(key) + "=" + encodeURIComponent(e[key]));
+                }
+            }
+            xhr.send(formData.join("&"));
         
             console.log("D.uA: f after POST request", f);
         };
+        
+        
         
         d.FT = function(a, b, c, e) {
             console.log("FT called with a:", JSON.stringify(a));
@@ -11570,12 +11593,11 @@
                     console.log("Slow down error, doubling the interval for c:", c);
                     c *= 2;
                 }
-        
-                // Set a simple timeout to retry the uA call after the adjusted interval
+    
                 this.Fy = setTimeout(function() {
                     console.log("Retrying uA with b:", b, ", c:", c, ", e:", e);
-                    this.uA(b, c, e); // Retry uA after the timeout
-                }.bind(this), 50000);
+                    this.uA(b, c, e); 
+                }.bind(this), 5000);
                 } else {
                     console.log("Proceeding with Jz and Rz methods.");
                     this.Jz(a.refresh_token);
@@ -15583,7 +15605,7 @@
                 this.kl = a || null;
                 this.Zh = b || 0;
                 a = this.kw + "/test";
-                b = this.kw + "/bind";
+                b = PROXY_URL + "/https://youtube.com/api/lounge/bc/bind";
                 var e = new Ji("1", c ? c.firstTestResults : null, c ? c.secondTestResults : null),
                     f = this.oa;
                 f && f.Mw(null);
@@ -15665,6 +15687,7 @@
             this.wl("onStateOpened", this.gA, this);
             this.wl(Eh.ERROR, this.gA, this)
         }
+
         z(Ti, Si);
         d = Ti.prototype;
         d.gA = function() {
@@ -16112,18 +16135,18 @@
             this.lq.remove("yt_mdx_screen");
             this.qa = null
         };
+        
         d.Ml = function(a) {
-            var b = Number(hf(document.location.href)[4] || null) || null || "";
-            b && (b = ":" + b);
-            var c = hf(document.location.href)[3] || null;
-            return "https://" + (c && decodeURIComponent(c)) + b + a
+            return PROXY_URL + "/http://youtube.com/" + a;
         };
+        
+
         d.cy = function() {
             this.qa && (this.qa.rc = "");
             Ah(w(this.cy, this), 864E5)
         };
         d.wL = function(a) {
-            S.eg(this.Ml("/api/lounge/pairing/generate_screen_id"), {
+            S.eg((PROXY_URL + "/https://www.youtube.com/api/lounge/pairing/generate_screen_id"), {
                 method: "GET",
                 format: "RAW",
                 yd: function(b) {
@@ -16139,7 +16162,7 @@
                 screen_id: this.qa.Tc || "",
                 screen_name: b
             };
-            S.eg(this.Ml("/api/lounge/pairing/get_pairing_code"), {
+            S.eg((PROXY_URL + "/https://www.youtube.com/api/lounge/pairing/get_pairing_code"), {
                 Sp: a,
                 method: "POST",
                 format: "RAW",
@@ -16150,7 +16173,7 @@
             })
         };
         d.vT = function(a, b, c) {
-            S.eg(this.Ml("/api/lounge/pairing/register_pairing_code"), {
+            S.eg((PROXY_URL + "/https://www.youtube.com/api/lounge/pairing/register_pairing_code"), {
                 Sp: {
                     screen_id: this.qa.Tc,
                     pairing_code: a,
@@ -16171,7 +16194,7 @@
                 }, this);
                 b(f)
             }, this);
-            S.eg(this.Ml("/api/lounge/pairing/get_lounge_token_batch"), {
+            S.eg((PROXY_URL + "/https://www.youtube.com/api/lounge/pairing/get_lounge_token_batch"), {
                 Sp: {
                     screen_ids: a
                 },
@@ -19429,7 +19452,7 @@
             b.className != a && (b.className = a)
         };
         d.bP = function() {
-            this.zs = "bg" + Math.floor(47 * Math.random() + 1) + ".jpg"
+            this.zs = "bg" + Math.floor(56 * Math.random() + 1) + ".jpg"
         };
         d.Xf = function(a) {
             if (this.G.supportsBackgrounds && !this.kt()) {

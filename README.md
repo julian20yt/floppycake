@@ -11,6 +11,8 @@ A project to revive the old 2012-2014 YouTubeTV HTML5 Web App.
 ![Screenshot 2](screenshots/s2.png)
 ![Screenshot 3](screenshots/s3.png)
 ![Screenshot 4](screenshots/s4.png)
+![Screenshot 5](screenshots/s5.png)
+![Screenshot 6](screenshots/s6.png)
 
 ## Credits
 
@@ -116,36 +118,35 @@ change it, and this is copied and changed from 2016YouTubeTV]
 
 Progress Report
 
-1. Search - 55% Done
+1. Search - 90% Done
 
-    Status: Currently static.
-    Next Steps: Fetch data from InnnerTube.
+    Status: Fetches from YouTube and has all the feilds you need.
+    Next Steps: Add conutiration support and such.
 
-3. Browse/Channels/Stantered Feeds/ - 40% Done
+3. Browse/Channels/Stantered Feeds/ - 90% Done
 
-    Status: Around half the statndered feeds are done (some need to find the right 
-    browseId, and some need to be added to the list), I also need to work on user feeds as well.
-    Next Steps: Implement /user/, finish feeds.
+    Status: Pretty much all ostatndered feeds are done.
+    Next Steps: Fix missing data.
 
-4a. Watch - 65% Done
+4a. Watch - 75% Done
 
-    Status: Playing videos and gets the data it needs for the info..
-    Next Steps: Implemete realated videos feed.
+    Status: Playing videos and gets the data it needs for the info, and realated videos..
+    Next Steps: Implemete aurthor channel videos feed.
 
 4b. Watch Interactions - 0% Done
 
     Status: Nothing.
     Next Steps: Get it working.
 
-5. Pairing - 0% Done
+5. Pairing - 35% Done
 
-    Status: None.
-    Next Steps: Get it working.
+    Status: It generates a code but doesn't bind.
+    Next Steps: Figure out why it aint binding.
 
-6. Sign In - 20% Done
+6. Sign In - 65% Done
 
-    Status: Currently gets a code.
-    Next Steps: Figure out why the /token is only getting called once (it needs to keep looking to work).
+    Status: You can sign in and a majority of feeds are implemted.
+    Next Steps: See if I can fix the activity (idk) and some other feeds.
 
 7. Assets - 80% Done
 

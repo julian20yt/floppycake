@@ -398,7 +398,6 @@ class FeedsApiVideos {
     }
 }
 
-// Route to handle video request
 router.get('/feeds/api/videos/:videoId', FeedsApiVideos.getVideos);
 
 module.exports = router;

@@ -7,11 +7,18 @@ const QRCode = require('qrcode');
 const corsAnywhere = require('cors-anywhere');
 const bodyParser = require('body-parser');
 const oauthRouter = require('./oauth_api_v3_api.js');
-const leanbackAjaxRouter = require('./leanback_ajax_api')
-;
+const leanbackAjaxRouter = require('./leanback_ajax_api');
+
 const gdataVideoFeedDetails = require('./gdata_video_feed_details');
 const gdataVideoFeedSearch = require('./gdata_video_feed_search');
 const gdataVideoFeedStandardFeeds = require('./gdata_video_feed_standardfeeds');
+const gdataVideoFeedDefaultInfo = require('./gdata_video_feed_default_info');
+const gdataVideoFeedDefaultWatchLater = require('./gdata_video_feed_watch_later');
+const gdataVideoFeedDefaultRecommendationsWhatToWatch = require('./gdata_video_feed_recommendations_watch_to_watch');
+const gdataVideoFeedDefaultUploads = require('./gdata_video_feed_default_uploads');
+const gdataVideoFeedRealated = require('./gdata_video_feed_related');
+
+
 
 const { handleGetVideoInfo } = require('./get_video_info');
 
@@ -142,6 +149,38 @@ app.get('/api/chart', async (req, res) => {
     }
 });
 
+// Lounge Stuff
+
+app.get('/api/lounge/bc/test', async (req, res) => {
+    const requestUrl = 'http://youtube.com/api/lounge/bc/test';
+    
+    try {
+        const response = await axios.get(requestUrl, {
+            params: req.query,
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error fetching data from external API:', error.response ? error.response.data : error.message);
+        res.status(500).send('Failed to fetch data from external API');
+    }
+});
+
+app.post('/api/lounge/bc/bind', async (req, res) => {
+    const requestUrl = 'https://www.youtube.com/api/lounge/bc/bind';
+
+    try {
+        const response = await axios.post(requestUrl, null, {
+            params: req.query, 
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error fetching data from external API:', error.response ? error.response.data : error.message);
+        res.status(500).send('Failed to fetch data from external API');
+    }
+});
+
 // Video Info API
 app.get('/get_video_info', handleGetVideoInfo);
 
@@ -172,13 +211,26 @@ app.use(leanbackAjaxRouter);
 // for video details, like a ye old /next
 app.use(gdataVideoFeedDetails);
 
-
 //for video search, like a ye old search
 app.use(gdataVideoFeedSearch);
 
 //for topic homepage, like a ye old browse topics
 app.use(gdataVideoFeedStandardFeeds);
 
+//for info for the uhh settings, like a ye old channel ai v3 thingy (it is in a seperete file despite being techinally part of default)
+app.use(gdataVideoFeedDefaultInfo);
+
+//for info for the uhh watch later videos, like a ye old idk
+app.use(gdataVideoFeedDefaultWatchLater);
+
+//for info for the uhh recommendations videos and what to watch
+app.use(gdataVideoFeedDefaultRecommendationsWhatToWatch);
+
+//for user uploads
+app.use(gdataVideoFeedDefaultUploads);
+
+//for realted videos
+app.use(gdataVideoFeedRealated);
 
 
 // Start the server

@@ -93,73 +93,11 @@ class FeedsApiVideos {
         return now.toISOString(); 
     }
     
+    static async handleRecommendationsRequest(req, res, accessToken) {
 
-    static async handleSearchRequest(req, directQuery = null) {
 
-      console.log('Search query:', directQuery || req.query.q);
-  
-      const query = directQuery || req.query.q;
-  
-      if (!query) {
-          console.error("Missing query in the request body.");
-          throw new Error('Missing query in the request body.');
-      }
-  
-      const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
-      const apiUrl = 'https://www.googleapis.com/youtubei/v1/search';
-  
-      const postData = {
-          query,
-          context: {
-              client: {
-                  clientName: 'TVHTML5',
-                  clientVersion: '7.20240701.16.00',
-                  hl: 'en',
-                  gl: 'US',
-              }
-          }
-      };
-  
-      try {
-          const response = await axios.post(apiUrl, postData, {
-              headers: { 'Content-Type': 'application/json' },
-              params: { key: apiKey }
-          });
-  
-          console.log("Raw response data:", JSON.stringify(response.data, null, 2));
-  
-          const logsDir = path.join(__dirname, 'logs');
-          if (!fs.existsSync(logsDir)) {
-              fs.mkdirSync(logsDir);
-          }
-  
-          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const logFilePath = path.join(logsDir, `search-response-${timestamp}.json`);
-  
-          fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2));
-  
-          let intermediateForm;
-          try {
-              intermediateForm = await this.convertToIntermediateForm(response.data);
-          } catch (convertError) {
-              console.error("Error converting API response to intermediate form:", convertError);
-              throw new Error('Failed to process API response.');
-          }
-  
-          return intermediateForm;
-  
-      } catch (error) {
-          console.error("Error fetching data from YouTube API:", error.message);
-          return [];
-      }
-    }
-
-    static async handleBrowseRequest(req, res, browseId) {
- 
         const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
         const apiUrl = 'https://www.googleapis.com/youtubei/v1/browse';
-
-        const accessToken = req.query.access_token;
 
         const postData = {
             context: {
@@ -217,17 +155,20 @@ class FeedsApiVideos {
             }
         };
 
+        postData.browseId = "FEwhat_to_watch";
+
+            
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+
         if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
+            headers['Authorization'] = `Bearer ${accessToken}`;
         }
-
-        postData.browseId = browseId;
-
-
     
         try {
             const response = await axios.post(apiUrl, postData, {
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 params: { key: apiKey }
             });
     
@@ -239,7 +180,7 @@ class FeedsApiVideos {
             }
     
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const logFilePath = path.join(logsDir, `browse-response-${timestamp}.json`);
+            const logFilePath = path.join(logsDir, `recommended-browse-response-${timestamp}.json`);
             fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
     
             let intermediateForm;
@@ -256,132 +197,79 @@ class FeedsApiVideos {
             return intermediateForm;
     
         } catch (error) {
-            console.error("Error fetching data from YouTube API:", error.message);
-            return [];
-        }
-    }
-    
+              console.error("Error fetching data from YouTube API:", error.message);
+              return [];
+          }
+      }
 
-    static async convertToIntermediateFormBrowse(responseData) {
+      static async convertToIntermediateFormBrowse(responseData) {
         const videos = [];
     
-        const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
+        console.log("items yap", JSON.stringify(responseData));
     
-        if (Array.isArray(items)) {
-            for (const item of items) {
-                const video = item.tileRenderer;
+        const shelfRenderers = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
     
-                if (video) {
-                    const publishedText = video.metadata?.tileMetadataRenderer?.lines
-                        ?.find(line => line.lineRenderer?.items
-                            ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
-                        ?.lineRenderer?.items
-                        ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
-                        ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
+        if (Array.isArray(shelfRenderers)) {
+            for (const shelf of shelfRenderers) {
+                const items = shelf?.shelfRenderer?.content?.horizontalListRenderer?.items;
     
-                    const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+                if (Array.isArray(items)) {
+                    for (const item of items) {
+                        const video = item?.tileRenderer;
     
-                    const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
-                        ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
-                        ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
-    
-                    const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
-    
-                    const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "John Doe";
-    
-                    const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
-    
+                        if (video) {
 
-                    const videoData = {
-                        id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
-                        author: authorText,
-                        title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
-                        etag: video.etag || "null",
-                        published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
-                        updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
-                        category: video.category || "Unknown Category",
-                        categoryLabel: video.categoryLabel || "Unknown Category Label",
-                        seconds: formatteddurationText,
-                        pfp: pfpUrl
-                    };
+                            const publishedText = video.metadata?.tileMetadataRenderer?.lines
+                                ?.find(line => line.lineRenderer?.items
+                                    ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
+                                ?.lineRenderer?.items
+                                ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
+                                ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
     
-                    videos.push(videoData);
+                            const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+    
+                            const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
+                                ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
+                                ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
+                            const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
+    
+                            const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+                                || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+                                || "John Doe";
+    
+                            const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+                                || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+                                || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj";
+    
+                            const videoData = {
+                                id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
+                                author: authorText,
+                                title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
+                                etag: video.etag || "null",
+                                published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
+                                updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
+                                category: video.category || "Unknown Category",
+                                categoryLabel: video.categoryLabel || "Unknown Category Label",
+                                seconds: formatteddurationText,
+                                pfp: pfpUrl
+                            };
+    
+                            videos.push(videoData);
+                        }
+                    }
+                } else {
+                    console.warn("No items found in shelfRenderer.");
                 }
             }
         } else {
-            console.error("No items found in responseData.");
+            console.error("No shelfRenderers found in responseData.");
         }
     
         return videos;
     }
     
-    
-    static async convertToIntermediateForm(responseData) {
-        const videos = [];
-
-        const items = responseData?.contents?.sectionListRenderer?.contents[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
-
-        if (Array.isArray(items)) {
-          items.forEach(async item => {
-            const video = item.tileRenderer;
-            
-            if (video) {
-
-              const publishedText = video.metadata?.tileMetadataRenderer?.lines
-              ?.find(line => line.lineRenderer?.items
-                  ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))?.lineRenderer?.items
-              ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
-              ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
-              
-              const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
-
-              console.log(formattedPublishedTime); 
-
-
-              const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
-              ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
-              ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
-
-              const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
-
-              console.log("Duration:", formatteddurationText); 
-
-              const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "John Doe";
-
-              const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-              || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-              || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
-
-
-              const videoData = {
-                id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID", 
-                author: authorText  || "John Doe",
-                title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unkown Title", 
-                etag: video.etag || "null", 
-                published: formattedPublishedTime || "2013-05-10T00:00:01.000Z", 
-                updated: video.updatedTimeText?.simpleText || "Unknown Updated Time", 
-                category: video.category || "Unknown Category", 
-                categoryLabel: video.categoryLabel || "Unknown Category Label", 
-                seconds: formatteddurationText
-              };
-
-              videos.push(videoData);
-            }
-          });
-        } else {
-          console.error("No items found in responseData.");
-        }
-    
-        return videos;
-    }
-
     static async generateVideoTemplate(parsedVideoData) {
       
-
         if (parsedVideoData == "null" || parsedVideoData == ' ' || parsedVideoData == null ) {
             return "";
         }
@@ -649,65 +537,15 @@ class FeedsApiVideos {
 
     static async getVideos(req, res) {
 
-        const feedName = req.params.feedName || "most_popular";
-      
-  
-        const browseIdMap = {
-            "most_popular": "FEtopics",
-            "most_popular_Tech": "null",
-            "most_popular_Games": "FEtopics_gaming",
-            "most_popular_Film": "FEtopics_movies",
-            "most_popular_News": "null",
-            "most_popular_Sports": "null" ,
-            "most_popular_Music": "null",
-            "most_popular_Comedy": "null",
-            "most_popular_People": "null",
-            "most_popular_Trending": "null",
-            "most_popular_Entertainment": "null",
-            "most_popular_Howto": "null",
-            "most_popular_Howto": "null",
-            "most_popular_Education": "null",
-            "most_popular_Animals": "null",
-        };
+        const accessToken = req.query.access_token;
 
-        if (!browseIdMap[feedName] && feedName !== "most_popular_Sports") {
-          const errorMessage = `Invalid feed name: ${feedName}. Valid feed names are: ${Object.keys(browseIdMap).join(", ")}.`;
-          console.error(errorMessage);
-        }
-
-        var browseId = browseIdMap[feedName] || "FEtopics";
-
-        let videoData;
-    
-        if (req.params.feedName === "most_popular_Tech") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Tech");
-        } else if (req.params.feedName === "most_popular_News") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 News");
-        } else if (req.params.feedName === "most_popular_Comedy") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Comedy");
-        } else if (req.params.feedName === "most_popular_People") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 People & Blogs");
-        } else if (req.params.feedName === "most_popular_Trending") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "YouTube Trending Videos 2025");
-        } else if (req.params.feedName === "most_popular_Music") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Music");
-        } else if (req.params.feedName === "most_popular_Sports") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Sports");
-        } else if (req.params.feedName === "most_popular_Film") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "2025 Film");
-        } else if (req.params.feedName === "most_popular_Entertainment") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "Entertaining Videos 2025");
-        } else if (req.params.feedName === "most_popular_Howto") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "Howto and Style 2025");
-        } else if (req.params.feedName === "most_popular_Education") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "Educational Videos For Adults");
-        } else if (req.params.feedName === "most_popular_Animals") {
-            videoData = await FeedsApiVideos.handleSearchRequest(req, "Pets and Animals 2025");
-        } else {
-            const browseId = browseIdMap[req.params.feedName] || "FEtopics"; 
-            videoData = await FeedsApiVideos.handleBrowseRequest(req, res, browseId);
+        if (!accessToken) {
+            return res.status(418).json({ error: "Missing access_token in request." });
         }
         
+        let videoData;
+
+        videoData = await FeedsApiVideos.handleRecommendationsRequest(req, res, accessToken);
 
         if (videoData.length === 0) {
             return res.status(404).send("No videos found.");
@@ -822,7 +660,8 @@ class FeedsApiVideos {
     }
 }
 
-router.get('/feeds/api/standardfeeds/:feedName', FeedsApiVideos.getVideos);
-
+router.get('/feeds/api/users/default/recommendations', FeedsApiVideos.getVideos);
+router.get('/feeds/api/users/default/river', FeedsApiVideos.getVideos);
+ 
 
 module.exports = router;

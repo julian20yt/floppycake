@@ -96,6 +96,8 @@ class FeedsApiVideos {
     static async handleSearchRequest(req) {
         const query = req.query.q;
 
+        const accessToken = req.query.access_token;
+
         if (!query) {
           console.error("Missing query in the request body.");
           throw new Error('Missing query in the request body.');
@@ -115,6 +117,10 @@ class FeedsApiVideos {
                 }
             }
         };
+
+        if (accessToken) {
+          headers['Authorization'] = `Bearer ${accessToken}`;
+        }
 
         try {
             const response = await axios.post(apiUrl, postData, {
@@ -194,8 +200,6 @@ class FeedsApiVideos {
         return videos;
     }
     
-    
-
     static async generateVideoTemplate(parsedVideoData) {
 
         if (parsedVideoData == "null" || parsedVideoData == ' ' || parsedVideoData == null ) {
@@ -450,7 +454,7 @@ class FeedsApiVideos {
     }
     
     static async generateVideoList(videosData) {
-        const videoTemplates = []; // Declare as a local array
+        const videoTemplates = []; 
         for (const videoData of videosData) {
             const videoTemplate = await this.generateVideoTemplate(videoData);
             videoTemplates.push(videoTemplate);
@@ -569,7 +573,7 @@ class FeedsApiVideos {
     
         if (callback) {
             const jsonpResponse = `${callback}(${jsonData})`;
-            return res.send(jsonpResponse); // Send the JSONP response
+            return res.send(jsonpResponse);
         }
     
         return res.status(418).send("418 I'm a teapot: Callback is required for JSONP.");
@@ -578,7 +582,7 @@ class FeedsApiVideos {
     
 }
 
-// Route to handle video request
+
 router.get('/feeds/api/videos', FeedsApiVideos.getVideos);
 
 module.exports = router;
