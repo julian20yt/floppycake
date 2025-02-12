@@ -3,243 +3,135 @@ const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const router = express.Router();
+const youtubedl = require('youtube-dl-exec');
 
 
 class FeedsApiVideos {
   
 
-    static async convertViewsToNumber(viewsString) {
-        const match = viewsString.match(/^(\d+(\.\d+)?)(k|m|b)$/i);
+      static async convertViewsToNumber(viewsString) {
+          const match = viewsString.match(/^(\d+(\.\d+)?)(k|m|b)$/i);
 
-        if (match) {
-            const value = parseFloat(match[1]); 
-            const unit = match[3].toLowerCase(); 
-            
-            let multiplier = 1;
+          if (match) {
+              const value = parseFloat(match[1]); 
+              const unit = match[3].toLowerCase(); 
+              
+              let multiplier = 1;
 
-            switch (unit) {
-                case 'k':
-                    multiplier = 1000;
-                    break;
-                case 'm':
-                    multiplier = 1000000; 
-                    break;
-                case 'b':
-                    multiplier = 1000000000;
-                    break;
-                default:
-                    return viewsString; 
-            }
-
-            const result = value * multiplier;
-            return result.toLocaleString(); 
-        }
-
-        return viewsString; 
-    }
-
-
-    static async convertTimeToSeconds(timeString) {
-        const timeParts = timeString.split(':');
-
-        if (timeParts.length !== 2) {
-            return "0";
-        }
-        
-        const minutes = parseInt(timeParts[0], 10);
-        const seconds = parseInt(timeParts[1], 10);
-        
-        if (isNaN(minutes) || isNaN(seconds) || minutes < 0 || seconds < 0 || seconds >= 60) {
-            return "0";  
-        }
-        
-        const totalSeconds = minutes * 60 + seconds;
-        
-        return totalSeconds;
-    }
-
-
-    static async convertRelativeDate(relativeDate) {
-        const now = new Date();
-
-        const match = relativeDate.match(/(\d+)\s*(day|days|week|weeks|month|months|year|years)\s*ago/i);
-
-        if (!match) return "2013-05-10T00:00:01.000Z";  
-
-        const value = parseInt(match[1], 10);  
-        const unit = match[2].toLowerCase();  
-
-        switch (unit) {
-            case "day":
-            case "days":
-                now.setDate(now.getDate() - value);
-                break;
-            case "week":
-            case "weeks":
-                now.setDate(now.getDate() - value * 7);
-                break;
-            case "month":
-            case "months":
-                now.setMonth(now.getMonth() - value);
-                break;
-            case "year":
-            case "years":
-                now.setFullYear(now.getFullYear() - value);
-                break;
-            default:
-                return "Invalid unit";
-        }
-
-        return now.toISOString(); 
-    }
-    
-
-    static async handleSearchRequest(req, directQuery = null) {
-
-      console.log('Search query:', directQuery || req.query.q);
-  
-      const query = directQuery || req.query.q;
-
-      const accessToken = req.query.access_token;
-
-  
-      if (!query) {
-          console.error("Missing query in the request body.");
-          throw new Error('Missing query in the request body.');
-      }
-  
-      const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
-      const apiUrl = 'https://www.googleapis.com/youtubei/v1/search';
-  
-      const postData = {
-          query,
-          context: {
-              client: {
-                  clientName: 'TVHTML5',
-                  clientVersion: '7.20240701.16.00',
-                  hl: 'en',
-                  gl: 'US',
+              switch (unit) {
+                  case 'k':
+                      multiplier = 1000;
+                      break;
+                  case 'm':
+                      multiplier = 1000000; 
+                      break;
+                  case 'b':
+                      multiplier = 1000000000;
+                      break;
+                  default:
+                      return viewsString; 
               }
-          }
-      };
-  
-      const headers = {
-        'Content-Type': 'application/json',
-      };
 
-      if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
+              const result = value * multiplier;
+              return result.toLocaleString(); 
+          }
+
+          return viewsString; 
       }
 
-      try {
-          const response = await axios.post(apiUrl, postData, {
-              headers: headers,
-              params: { key: apiKey }
-          });
-  
-          console.log("Raw response data:", JSON.stringify(response.data, null, 2));
-  
-          const logsDir = path.join(__dirname, 'logs');
-          if (!fs.existsSync(logsDir)) {
-              fs.mkdirSync(logsDir);
-          }
-  
-          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const logFilePath = path.join(logsDir, `search-response-${timestamp}.json`);
-  
-          fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2));
-  
-          let intermediateForm;
-          try {
-              intermediateForm = await this.convertToIntermediateForm(response.data);
-          } catch (convertError) {
-              console.error("Error converting API response to intermediate form:", convertError);
-              throw new Error('Failed to process API response.');
-          }
-  
-          return intermediateForm;
-  
-      } catch (error) {
-          console.error("Error fetching data from YouTube API:", error.message);
-          return [];
-      }
-    }
 
-    static async handleBrowseRequest(req, res, browseId) {
- 
-        const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
-        const apiUrl = 'https://www.googleapis.com/youtubei/v1/browse';
+      static async convertTimeToSeconds(timeString) {
+          const timeParts = timeString.split(':');
+
+          if (timeParts.length !== 2) {
+              return "0";
+          }
+          
+          const minutes = parseInt(timeParts[0], 10);
+          const seconds = parseInt(timeParts[1], 10);
+          
+          if (isNaN(minutes) || isNaN(seconds) || minutes < 0 || seconds < 0 || seconds >= 60) {
+              return "0";  
+          }
+          
+          const totalSeconds = minutes * 60 + seconds;
+          
+          return totalSeconds;
+      }
+
+
+      static async convertRelativeDate(relativeDate) {
+          const now = new Date();
+
+          const match = relativeDate.match(/(\d+)\s*(day|days|week|weeks|month|months|year|years)\s*ago/i);
+
+          if (!match) return "2013-05-10T00:00:01.000Z";  
+
+          const value = parseInt(match[1], 10);  
+          const unit = match[2].toLowerCase();  
+
+          switch (unit) {
+              case "day":
+              case "days":
+                  now.setDate(now.getDate() - value);
+                  break;
+              case "week":
+              case "weeks":
+                  now.setDate(now.getDate() - value * 7);
+                  break;
+              case "month":
+              case "months":
+                  now.setMonth(now.getMonth() - value);
+                  break;
+              case "year":
+              case "years":
+                  now.setFullYear(now.getFullYear() - value);
+                  break;
+              default:
+                  return "Invalid unit";
+          }
+
+          return now.toISOString(); 
+      }
+      
+
+      static async handleSearchRequest(req, directQuery = null) {
+
+        console.log('Search query:', directQuery || req.query.q);
+    
+        const query = directQuery || req.query.q;
 
         const accessToken = req.query.access_token;
 
+    
+        if (!query) {
+            console.error("Missing query in the request body.");
+            throw new Error('Missing query in the request body.');
+        }
+    
+        const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
+        const apiUrl = 'https://www.googleapis.com/youtubei/v1/search';
+    
         const postData = {
+            query,
             context: {
                 client: {
-                    hl: "en",
-                    gl: "US",
-                    remoteHost: "67.144.118.91",
-                    deviceMake: "Samsung",
-                    deviceModel: "SmartTV",
-                    visitorData: "CgsxVi1janRGNC02TSiRzqu9BjIKCgJVUxIEGgAgMQ%3D%3D",
-                    userAgent: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 NativeTVAds Safari/538.1,gzip(gfe)",
-                    clientName: "TVHTML5",
-                    clientVersion: "7.20250209.19.00",
-                    osName: "Tizen",
-                    osVersion: "5.0",
-                    originalUrl: "https://www.youtube.com/tv?is_account_switch=1&hrld=1&fltor=1",
-                    theme: "CLASSIC",
-                    screenPixelDensity: 1,
-                    platform: "TV",
-                    clientFormFactor: "UNKNOWN_FORM_FACTOR",
-                    webpSupport: false,
-                    configInfo: {
-                        appInstallData: "CJHOq70GELzRzhwQz7nOHBCS2c4cEL2KsAUQ9quwBRCazrEFEIS9zhwQrsHOHBC9mbAFEImwzhwQj8OxBRCKobEFEI7QsQUQiOOvBRCB1rEFEIeszhwQ6-j-EhCN1LEFEMTYsQUQntCwBRD-5f8SEKC_zhwQoqPOHBC4mc4cEJT8rwUQ3rzOHBDEu84cEJLLsQUQwsnOHBDtubEFEJS7zhwQjtTOHBDG2LEFEL22rgUQ-rjOHBDT4a8FEIWnsQUQgcOxBRDM364FELK-zhwQmY2xBRC8ss4cEN6tsQUQr8LOHBDRlM4cEMjYsQUQy5rOHBC36v4SEKLUsQUQ59DOHBDlubEFEOeazhwQg8OxBRCM0LEFEIfDsQUQmZixBRCIh7AFELTj_xIQ6sOvBRCEha8FEIHNzhwQkrjOHBDAt84cEObPsQUQ-KuxBRDJ968FEI7XsQUQ2dXOHBDJ5rAFEMHa_xIQwrfOHBCZ0v8SEIvUsQUQ48nOHBDftM4cEJT-sAUQ_LLOHBDK2LEFENCNsAUQwc2xBRCH5v8SKiBDQU1TRWhVSi1acS1EUHJpRVlISjJ3dm1vUWdkQnc9PQ%3D%3D"
-                    },
-                    screenDensityFloat: 2,
-                    tvAppInfo: {
-                        appQuality: "TV_APP_QUALITY_LIMITED_ANIMATION",
-                        voiceCapability: {
-                            hasSoftMicSupport: false,
-                            hasHardMicSupport: false
-                        },
-                        useStartPlaybackPreviewCommand: false,
-                        supportsNativeScrolling: false
-                    },
-                    userInterfaceTheme: "USER_INTERFACE_THEME_DARK",
-                    timeZone: "America/New_York",
-                    browserName: "Safari",
-                    browserVersion: "5.0",
-                    acceptHeader: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    deviceExperimentId: "ChxOelEyT0RVd056WTFOREV4TURJMk9EZzJNQT09EJHOq70GGKTwlb0G",
-                    rolloutToken: "CJfLqI7Ivb_y1QEQnNWkuauwiwMYqPWjt7q4iwM%3D",
-                    screenHeightPoints: 1050,
-                    screenWidthPoints: 1920,
-                    utcOffsetMinutes: -300
-                },
-                user: {
-                    lockedSafetyMode: false
-                },
-                request: {
-                    useSsl: true
-                },
-                clickTracking: {
-                    clickTrackingParams: "IhMIqpfAovi6iwMVZgQVBR3TQjXr"
+                    clientName: 'TVHTML5',
+                    clientVersion: '7.20240701.16.00',
+                    hl: 'en',
+                    gl: 'US',
                 }
             }
         };
-
+    
         const headers = {
           'Content-Type': 'application/json',
         };
-  
+
         if (accessToken) {
             headers['Authorization'] = `Bearer ${accessToken}`;
         }
-  
-        postData.browseId = browseId;
 
-
-    
         try {
             const response = await axios.post(apiUrl, postData, {
                 headers: headers,
@@ -250,23 +142,21 @@ class FeedsApiVideos {
     
             const logsDir = path.join(__dirname, 'logs');
             if (!fs.existsSync(logsDir)) {
-                fs.mkdirSync(logsDir); 
+                fs.mkdirSync(logsDir);
             }
     
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const logFilePath = path.join(logsDir, `browse-response-${timestamp}.json`);
-            fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
+            const logFilePath = path.join(logsDir, `search-response-${timestamp}.json`);
+    
+            fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2));
     
             let intermediateForm;
             try {
-                intermediateForm = await this.convertToIntermediateFormBrowse(response.data);
+                intermediateForm = await this.convertToIntermediateForm(response.data);
             } catch (convertError) {
                 console.error("Error converting API response to intermediate form:", convertError);
                 throw new Error('Failed to process API response.');
             }
-    
-            const logFilePathIni = path.join(logsDir, `browse-intermediate-response-${timestamp}.json`);
-            fs.writeFileSync(logFilePathIni, JSON.stringify(intermediateForm, null, 2)); 
     
             return intermediateForm;
     
@@ -274,46 +164,215 @@ class FeedsApiVideos {
             console.error("Error fetching data from YouTube API:", error.message);
             return [];
         }
-    }
-    
+      }
 
-    static async convertToIntermediateFormBrowse(responseData) {
+      static async handleBrowseRequest(req, res, browseId) {
+  
+          const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
+          const apiUrl = 'https://www.googleapis.com/youtubei/v1/browse';
+
+          const accessToken = req.query.access_token;
+
+          const postData = {
+              context: {
+                  client: {
+                      hl: "en",
+                      gl: "US",
+                      remoteHost: "67.144.118.91",
+                      deviceMake: "Samsung",
+                      deviceModel: "SmartTV",
+                      visitorData: "CgsxVi1janRGNC02TSiRzqu9BjIKCgJVUxIEGgAgMQ%3D%3D",
+                      userAgent: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 NativeTVAds Safari/538.1,gzip(gfe)",
+                      clientName: "TVHTML5",
+                      clientVersion: "7.20250209.19.00",
+                      osName: "Tizen",
+                      osVersion: "5.0",
+                      originalUrl: "https://www.youtube.com/tv?is_account_switch=1&hrld=1&fltor=1",
+                      theme: "CLASSIC",
+                      screenPixelDensity: 1,
+                      platform: "TV",
+                      clientFormFactor: "UNKNOWN_FORM_FACTOR",
+                      webpSupport: false,
+                      configInfo: {
+                          appInstallData: "CJHOq70GELzRzhwQz7nOHBCS2c4cEL2KsAUQ9quwBRCazrEFEIS9zhwQrsHOHBC9mbAFEImwzhwQj8OxBRCKobEFEI7QsQUQiOOvBRCB1rEFEIeszhwQ6-j-EhCN1LEFEMTYsQUQntCwBRD-5f8SEKC_zhwQoqPOHBC4mc4cEJT8rwUQ3rzOHBDEu84cEJLLsQUQwsnOHBDtubEFEJS7zhwQjtTOHBDG2LEFEL22rgUQ-rjOHBDT4a8FEIWnsQUQgcOxBRDM364FELK-zhwQmY2xBRC8ss4cEN6tsQUQr8LOHBDRlM4cEMjYsQUQy5rOHBC36v4SEKLUsQUQ59DOHBDlubEFEOeazhwQg8OxBRCM0LEFEIfDsQUQmZixBRCIh7AFELTj_xIQ6sOvBRCEha8FEIHNzhwQkrjOHBDAt84cEObPsQUQ-KuxBRDJ968FEI7XsQUQ2dXOHBDJ5rAFEMHa_xIQwrfOHBCZ0v8SEIvUsQUQ48nOHBDftM4cEJT-sAUQ_LLOHBDK2LEFENCNsAUQwc2xBRCH5v8SKiBDQU1TRWhVSi1acS1EUHJpRVlISjJ3dm1vUWdkQnc9PQ%3D%3D"
+                      },
+                      screenDensityFloat: 2,
+                      tvAppInfo: {
+                          appQuality: "TV_APP_QUALITY_LIMITED_ANIMATION",
+                          voiceCapability: {
+                              hasSoftMicSupport: false,
+                              hasHardMicSupport: false
+                          },
+                          useStartPlaybackPreviewCommand: false,
+                          supportsNativeScrolling: false
+                      },
+                      userInterfaceTheme: "USER_INTERFACE_THEME_DARK",
+                      timeZone: "America/New_York",
+                      browserName: "Safari",
+                      browserVersion: "5.0",
+                      acceptHeader: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                      deviceExperimentId: "ChxOelEyT0RVd056WTFOREV4TURJMk9EZzJNQT09EJHOq70GGKTwlb0G",
+                      rolloutToken: "CJfLqI7Ivb_y1QEQnNWkuauwiwMYqPWjt7q4iwM%3D",
+                      screenHeightPoints: 1050,
+                      screenWidthPoints: 1920,
+                      utcOffsetMinutes: -300
+                  },
+                  user: {
+                      lockedSafetyMode: false
+                  },
+                  request: {
+                      useSsl: true
+                  },
+                  clickTracking: {
+                      clickTrackingParams: "IhMIqpfAovi6iwMVZgQVBR3TQjXr"
+                  }
+              }
+          };
+
+          const headers = {
+            'Content-Type': 'application/json',
+          };
+    
+          if (accessToken) {
+              headers['Authorization'] = `Bearer ${accessToken}`;
+          }
+    
+          postData.browseId = browseId;
+
+
+      
+          try {
+              const response = await axios.post(apiUrl, postData, {
+                  headers: headers,
+                  params: { key: apiKey }
+              });
+      
+              console.log("Raw response data:", JSON.stringify(response.data, null, 2));
+      
+              const logsDir = path.join(__dirname, 'logs');
+              if (!fs.existsSync(logsDir)) {
+                  fs.mkdirSync(logsDir); 
+              }
+      
+              const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+              const logFilePath = path.join(logsDir, `browse-response-${timestamp}.json`);
+              fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
+      
+              let intermediateForm;
+              try {
+                  intermediateForm = await this.convertToIntermediateFormBrowse(response.data);
+              } catch (convertError) {
+                  console.error("Error converting API response to intermediate form:", convertError);
+                  throw new Error('Failed to process API response.');
+              }
+      
+              const logFilePathIni = path.join(logsDir, `browse-intermediate-response-${timestamp}.json`);
+              fs.writeFileSync(logFilePathIni, JSON.stringify(intermediateForm, null, 2)); 
+      
+              return intermediateForm;
+      
+          } catch (error) {
+              console.error("Error fetching data from YouTube API:", error.message);
+              return [];
+          }
+      }
+      
+
+      static async convertToIntermediateFormBrowse(responseData) {
+          const videos = [];
+      
+          const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
+      
+          if (Array.isArray(items)) {
+              for (const item of items) {
+                  const video = item.tileRenderer;
+      
+                  if (video) {
+                      const publishedText = video.metadata?.tileMetadataRenderer?.lines
+                          ?.find(line => line.lineRenderer?.items
+                              ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
+                          ?.lineRenderer?.items
+                          ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
+                          ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
+      
+                      const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+      
+                      const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
+                          ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
+                          ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
+      
+                      const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
+      
+                      const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+                          || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+                          || "John Doe";
+      
+                      const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+                          || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+                          || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
+      
+
+                      const videoData = {
+                          id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
+                          author: authorText,
+                          title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
+                          etag: video.etag || "null",
+                          published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
+                          updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
+                          category: video.category || "Unknown Category",
+                          categoryLabel: video.categoryLabel || "Unknown Category Label",
+                          seconds: formatteddurationText,
+                          pfp: pfpUrl
+                      };
+      
+                      videos.push(videoData);
+                  }
+              }
+          } else {
+              console.error("No items found in responseData.");
+          }
+      
+          return videos;
+      }
+    
+      static async convertToIntermediateForm(responseData) {
         const videos = [];
     
-        const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
+        const items = responseData?.contents?.sectionListRenderer?.contents[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
     
         if (Array.isArray(items)) {
-            for (const item of items) {
+            const allPromises = items.map(async item => {
                 const video = item.tileRenderer;
     
                 if (video) {
-                    const publishedText = video.metadata?.tileMetadataRenderer?.lines
+
+                    const publishedTextPromise = video.metadata?.tileMetadataRenderer?.lines
                         ?.find(line => line.lineRenderer?.items
-                            ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
-                        ?.lineRenderer?.items
+                            ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))?.lineRenderer?.items
                         ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
                         ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
     
-                    const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+                    const formattedPublishedTimePromise = FeedsApiVideos.convertRelativeDate(publishedTextPromise);
     
-                    const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
+                    const getProfilePicturePromise = FeedsApiVideos.getProfilePicture(video.onSelectCommand?.watchEndpoint?.videoId);
+    
+                    const durationTextPromise = video.header?.tileHeaderRenderer?.thumbnailOverlays
                         ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
                         ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
     
-                    const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
+                    const formatteddurationTextPromise = FeedsApiVideos.convertTimeToSeconds(durationTextPromise);
     
-                    const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "John Doe";
+                    const [formattedPublishedTime, pfpUrl, formatteddurationText] = await Promise.all([
+                        formattedPublishedTimePromise,
+                        getProfilePicturePromise,
+                        formatteddurationTextPromise
+                    ]);
     
-                    const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
+                    const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "John Doe";
     
-
                     const videoData = {
                         id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
-                        author: authorText,
+                        author: authorText || "John Doe",
                         title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
                         etag: video.etag || "null",
                         published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
@@ -321,12 +380,14 @@ class FeedsApiVideos {
                         category: video.category || "Unknown Category",
                         categoryLabel: video.categoryLabel || "Unknown Category Label",
                         seconds: formatteddurationText,
-                        pfp: pfpUrl
+                        pfp: pfpUrl || "" 
                     };
     
                     videos.push(videoData);
                 }
-            }
+            });
+    
+            await Promise.all(allPromises);
         } else {
             console.error("No items found in responseData.");
         }
@@ -335,66 +396,78 @@ class FeedsApiVideos {
     }
     
     
-    static async convertToIntermediateForm(responseData) {
-        const videos = [];
-
-        const items = responseData?.contents?.sectionListRenderer?.contents[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
-
-        if (Array.isArray(items)) {
-          items.forEach(async item => {
-            const video = item.tileRenderer;
+      static async getProfilePicture(videoId) {
+          try {
             
-            if (video) {
+              const params = "qgMCZGG6AwoI5tiC0qjb9sRrugMKCNPa26_4mbGDJboDCgjYjIz7k73C8X26AwsIsuTT3PDW45rJAboDCgj_neig0riToyG6AwsI4Ifex42A0rbBAboDCwiBv8K9jND2_LkBugMLCJ6Oxdqf5r_QugG6AwsIiLTcqYLIvozQAboDCgi54P_p4OqE13m6AwsIkNCS1LL";
 
-              const publishedText = video.metadata?.tileMetadataRenderer?.lines
-              ?.find(line => line.lineRenderer?.items
-                  ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))?.lineRenderer?.items
-              ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
-              ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
-              
-              const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+              if (!params || params.trim() === "") {
+                  throw new Error('"params" must be a non-empty string.');
+              }
 
-              console.log(formattedPublishedTime); 
+              const response = await axios.post(
+                  "https://www.youtube.com/youtubei/v1/next",
+                  {
+                      context: {
+                          client: {
+                            clientName: 'TVHTML5',
+                            clientVersion: '5.20150715',
+                            screenWidthPoints: 600,
+                            screenHeightPoints: 275,
+                            screenPixelDensity: 2,
+                            theme: 'CLASSIC',
+                            webpSupport: false,
+                            acceptRegion: 'US',
+                            acceptLanguage: 'en-US',
+                        },
+                        user: {
+                            enableSafetyMode: false,
+                        },
+                      },
+                      params: params,
+                      videoId: videoId,
+                  },
+                  {
+                      headers: {
+                          "Content-Type": "application/json",
+                          "Origin": "https://www.youtube.com/",
+                          "Referer": "https://www.youtube.com/tv/",
+                          "User-Agent": "Mozilla/5.0"
+                      }
+                  }
+              );
 
+              const sections = response.data.contents?.singleColumnWatchNextResults?.results?.results?.contents;
+              if (!sections || sections.length < 2) {
+                  console.error("Failed to find the correct itemSectionRenderer.");
+                  return null;
+              }
 
-              const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
-              ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
-              ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
+              const secondSection = sections[1]?.itemSectionRenderer?.contents;
+              if (!secondSection) {
+                  console.error("Second itemSectionRenderer is missing.");
+                  return null;
+              }
 
-              const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
+              const ownerData = secondSection.find(item => item.videoOwnerRenderer);
+              if (!ownerData || !ownerData.videoOwnerRenderer) {
+                  console.error("Failed to find video owner data.");
+                  return null;
+              }
 
-              console.log("Duration:", formatteddurationText); 
+              const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop().url; 
 
-              const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "John Doe";
+              console.log(`Video ID: ${videoId}`);
+              console.log(`Profile Picture URL: ${pfpUrl}`);
 
-              const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-              || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-              || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Ensure author extraction works in different cases
+              return pfpUrl;
+          } catch (error) {
+              console.error("Error fetching profile picture:", error);
+          }
+      }
 
-
-              const videoData = {
-                id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID", 
-                author: authorText  || "John Doe",
-                title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unkown Title", 
-                etag: video.etag || "null", 
-                published: formattedPublishedTime || "2013-05-10T00:00:01.000Z", 
-                updated: video.updatedTimeText?.simpleText || "Unknown Updated Time", 
-                category: video.category || "Unknown Category", 
-                categoryLabel: video.categoryLabel || "Unknown Category Label", 
-                seconds: formatteddurationText
-              };
-
-              videos.push(videoData);
-            }
-          });
-        } else {
-          console.error("No items found in responseData.");
-        }
-    
-        return videos;
-    }
-
-    static async generateVideoTemplate(parsedVideoData) {
+ 
+      static async generateVideoTemplate(parsedVideoData) {
       
 
         if (parsedVideoData == "null" || parsedVideoData == ' ' || parsedVideoData == null ) {
@@ -414,6 +487,7 @@ class FeedsApiVideos {
 
         const pfpURL = parsedVideoData.pfp || `null`;
 
+        console.log(`Profile Picture URL 2: ${pfpURL}`);
     
         const videoTemplate = `
             {
@@ -469,7 +543,7 @@ class FeedsApiVideos {
                   {
                     "rel": "http://gdata.youtube.com/schemas/2007#uploader",
                     "type": "application/atom+xml",
-                    "href": "http://gdata.youtube.com/feeds/api/users/jmJDM5pRKbUlVIzDYYWb6g?v=2"
+                    "href": "http://gdata.youtube.com/feeds/api/users/${pfpURL}"
                   },
                   {
                     "rel": "self",
@@ -589,21 +663,21 @@ class FeedsApiVideos {
                       "yt$name": "sddefault"
                     },
                     {
-                      "url": "http://i.ytimg.com/vi/${id}/1.jpg",
+                      "url": "${pfpURL}",
                       "height": 90,
                       "width": 120,
                       "time": "00:00:22.750",
                       "yt$name": "start"
                     },
                     {
-                      "url": "http://i.ytimg.com/vi/${id}/2.jpg",
+                      "url": "${pfpURL}",
                       "height": 90,
                       "width": 120,
                       "time": "00:00:45.500",
                       "yt$name": "middle"
                     },
                     {
-                      "url": "http://i.ytimg.com/vi/${id}/3.jpg",
+                      "url": "${pfpURL}",
                       "height": 90,
                       "width": 120,
                       "time": "00:01:08.250",
@@ -624,7 +698,7 @@ class FeedsApiVideos {
                     "$t": "${published}"
                   },
                   "yt$uploaderId": {
-                    "$t": "UCjmJDM5pRKbUlVIzDYYWb6g"
+                    "$t": "${pfpURL}"
                   },
                   "yt$videoid": {
                     "$t": "${id}"

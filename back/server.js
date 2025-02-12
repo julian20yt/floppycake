@@ -14,10 +14,11 @@ const gdataVideoFeedSearch = require('./gdata_video_feed_search');
 const gdataVideoFeedStandardFeeds = require('./gdata_video_feed_standardfeeds');
 const gdataVideoFeedDefaultInfo = require('./gdata_video_feed_default_info');
 const gdataVideoFeedDefaultWatchLater = require('./gdata_video_feed_watch_later');
-const gdataVideoFeedDefaultRecommendationsWhatToWatch = require('./gdata_video_feed_recommendations_watch_to_watch');
+const gdataVideoFeedDefaultFavorites = require('./gdata_video_feed_default_favorites');
+const gdataVideoFeedDefaultRecommendations = require('./gdata_video_feed_default_recommendations.js');
 const gdataVideoFeedDefaultUploads = require('./gdata_video_feed_default_uploads');
 const gdataVideoFeedRealated = require('./gdata_video_feed_related');
-
+const gdataVideoFeedDefaultWhatToWatch = require('./gdata_video_feed_default_what_to_watch');
 
 
 const { handleGetVideoInfo } = require('./get_video_info');
@@ -223,14 +224,20 @@ app.use(gdataVideoFeedDefaultInfo);
 //for info for the uhh watch later videos, like a ye old idk
 app.use(gdataVideoFeedDefaultWatchLater);
 
-//for info for the uhh recommendations videos and what to watch
-app.use(gdataVideoFeedDefaultRecommendationsWhatToWatch);
+//for info for the uhh recommendations videos 
+app.use(gdataVideoFeedDefaultRecommendations);
 
 //for user uploads
 app.use(gdataVideoFeedDefaultUploads);
 
 //for realted videos
 app.use(gdataVideoFeedRealated);
+
+//for favoruites videos, this is also known as liked videos
+app.use(gdataVideoFeedDefaultFavorites);
+
+//for what to watch
+app.use(gdataVideoFeedDefaultWhatToWatch);
 
 
 // Start the server

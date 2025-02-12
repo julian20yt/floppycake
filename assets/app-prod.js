@@ -11075,6 +11075,7 @@
             xg.call(this, a, b);
             this.Ga("videoFromEntry", this.sk)
         }
+        
         z(yg, xg);
         d = yg.prototype;
         d.sk = function(a, b) {
@@ -23282,13 +23283,11 @@
                     }
                 }, {
                     name: "riverService",
-                    listType: "HP",
+                    listType: "RC",
                     path: "/users/{userName}/river",
-                    parser: "activityParser",
                     paramKey: "userName",
                     params: {
-                        fields: "title,logo,entry[$inline-filter],openSearch:totalResults",
-                        inline: !0
+                        fields: "title,logo,entry[$default-filter](title,yt:statistics,yt:hd,yt:claimed,yt:paidContent,yt:rating,media:group(yt:videoid,yt:duration,yt:uploaderId,yt:uploaded,media:credit,media:description)),openSearch:totalResults"
                     }
                 }, {
                     name: "playlistService",

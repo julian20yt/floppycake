@@ -33,10 +33,8 @@ class FeedsApiVideos {
     
             const response = await axios.post(apiUrl, postData, { headers });
     
-            // Extract guide items
             const guideItems = response.data.items.map(section => section.guideSectionRenderer.items).flat();
     
-            // Extract username and thumbnail
             const channels = guideItems.map(item => {
                 const guideAccount = item.guideAccountEntryRenderer;
                 if (guideAccount && guideAccount.title && guideAccount.thumbnail) {
@@ -45,7 +43,7 @@ class FeedsApiVideos {
                         thumbnail: guideAccount.thumbnail.thumbnails[0].url
                     };
                 }
-            }).filter(Boolean); // Removes undefined/null entries
+            }).filter(Boolean); 
     
             return channels;
         } catch (error) {

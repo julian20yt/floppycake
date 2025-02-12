@@ -93,7 +93,7 @@ class FeedsApiVideos {
         return now.toISOString(); 
     }
     
-    static async handleWatchLaterRequest(req, res, accessToken) {
+    static async handleRecommendationsRequest(req, res, accessToken) {
 
 
         const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
@@ -154,8 +154,8 @@ class FeedsApiVideos {
                 }
             }
         };
-
-        postData.browseId = "VLWL";
+          
+        postData.browseId = "FEwhat_to_watch";
 
             
         const headers = {
@@ -180,7 +180,7 @@ class FeedsApiVideos {
             }
     
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const logFilePath = path.join(logsDir, `watch-later-browse-response-${timestamp}.json`);
+            const logFilePath = path.join(logsDir, `recommended-browse-response-${timestamp}.json`);
             fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
     
             let intermediateForm;
@@ -197,142 +197,261 @@ class FeedsApiVideos {
             return intermediateForm;
     
         } catch (error) {
+              console.error("Error fetching data from YouTube API:", error.message);
+              return [];
+          }
+    }
+
+    static async handleSubscriptionsRequest(req, res, accessToken) {
+
+      const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
+      const apiUrl = 'https://www.googleapis.com/youtubei/v1/browse';
+
+      const postData = {
+          context: {
+              client: {
+                  hl: "en",
+                  gl: "US",
+                  remoteHost: "67.144.118.91",
+                  deviceMake: "Samsung",
+                  deviceModel: "SmartTV",
+                  visitorData: "CgsxVi1janRGNC02TSiRzqu9BjIKCgJVUxIEGgAgMQ%3D%3D",
+                  userAgent: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 NativeTVAds Safari/538.1,gzip(gfe)",
+                  clientName: "TVHTML5",
+                  clientVersion: "7.20250209.19.00",
+                  osName: "Tizen",
+                  osVersion: "5.0",
+                  originalUrl: "https://www.youtube.com/tv?is_account_switch=1&hrld=1&fltor=1",
+                  theme: "CLASSIC",
+                  screenPixelDensity: 1,
+                  platform: "TV",
+                  clientFormFactor: "UNKNOWN_FORM_FACTOR",
+                  webpSupport: false,
+                  configInfo: {
+                      appInstallData: "CJHOq70GELzRzhwQz7nOHBCS2c4cEL2KsAUQ9quwBRCazrEFEIS9zhwQrsHOHBC9mbAFEImwzhwQj8OxBRCKobEFEI7QsQUQiOOvBRCB1rEFEIeszhwQ6-j-EhCN1LEFEMTYsQUQntCwBRD-5f8SEKC_zhwQoqPOHBC4mc4cEJT8rwUQ3rzOHBDEu84cEJLLsQUQwsnOHBDtubEFEJS7zhwQjtTOHBDG2LEFEL22rgUQ-rjOHBDT4a8FEIWnsQUQgcOxBRDM364FELK-zhwQmY2xBRC8ss4cEN6tsQUQr8LOHBDRlM4cEMjYsQUQy5rOHBC36v4SEKLUsQUQ59DOHBDlubEFEOeazhwQg8OxBRCM0LEFEIfDsQUQmZixBRCIh7AFELTj_xIQ6sOvBRCEha8FEIHNzhwQkrjOHBDAt84cEObPsQUQ-KuxBRDJ968FEI7XsQUQ2dXOHBDJ5rAFEMHa_xIQwrfOHBCZ0v8SEIvUsQUQ48nOHBDftM4cEJT-sAUQ_LLOHBDK2LEFENCNsAUQwc2xBRCH5v8SKiBDQU1TRWhVSi1acS1EUHJpRVlISjJ3dm1vUWdkQnc9PQ%3D%3D"
+                  },
+                  screenDensityFloat: 2,
+                  tvAppInfo: {
+                      appQuality: "TV_APP_QUALITY_LIMITED_ANIMATION",
+                      voiceCapability: {
+                          hasSoftMicSupport: false,
+                          hasHardMicSupport: false
+                      },
+                      useStartPlaybackPreviewCommand: false,
+                      supportsNativeScrolling: false
+                  },
+                  userInterfaceTheme: "USER_INTERFACE_THEME_DARK",
+                  timeZone: "America/New_York",
+                  browserName: "Safari",
+                  browserVersion: "5.0",
+                  acceptHeader: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                  deviceExperimentId: "ChxOelEyT0RVd056WTFOREV4TURJMk9EZzJNQT09EJHOq70GGKTwlb0G",
+                  rolloutToken: "CJfLqI7Ivb_y1QEQnNWkuauwiwMYqPWjt7q4iwM%3D",
+                  screenHeightPoints: 1050,
+                  screenWidthPoints: 1920,
+                  utcOffsetMinutes: -300
+              },
+              user: {
+                  lockedSafetyMode: false
+              },
+              request: {
+                  useSsl: true
+              },
+              clickTracking: {
+                  clickTrackingParams: "IhMIqpfAovi6iwMVZgQVBR3TQjXr"
+              }
+          }
+      };
+        
+      postData.browseId = "FEsubscriptions";
+
+          
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (accessToken) {
+          headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+  
+      try {
+          const response = await axios.post(apiUrl, postData, {
+              headers,
+              params: { key: apiKey }
+          });
+  
+          console.log("Raw response data:", JSON.stringify(response.data, null, 2));
+  
+          const logsDir = path.join(__dirname, 'logs');
+          if (!fs.existsSync(logsDir)) {
+              fs.mkdirSync(logsDir); 
+          }
+  
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const logFilePath = path.join(logsDir, `sub-browse-response-${timestamp}.json`);
+          fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
+  
+          let intermediateForm;
+          try {
+              intermediateForm = await this.convertToIntermediateFormBrowse(response.data);
+          } catch (convertError) {
+              console.error("Error converting API response to intermediate form:", convertError);
+              throw new Error('Failed to process API response.');
+          }
+  
+          const logFilePathIni = path.join(logsDir, `browse-intermediate-response-${timestamp}.json`);
+          fs.writeFileSync(logFilePathIni, JSON.stringify(intermediateForm, null, 2)); 
+  
+          return intermediateForm;
+  
+      } catch (error) {
             console.error("Error fetching data from YouTube API:", error.message);
             return [];
         }
     }
 
     static async getProfilePicture(videoId) {
-          try {
-            
-              const params = "qgMCZGG6AwoI5tiC0qjb9sRrugMKCNPa26_4mbGDJboDCgjYjIz7k73C8X26AwsIsuTT3PDW45rJAboDCgj_neig0riToyG6AwsI4Ifex42A0rbBAboDCwiBv8K9jND2_LkBugMLCJ6Oxdqf5r_QugG6AwsIiLTcqYLIvozQAboDCgi54P_p4OqE13m6AwsIkNCS1LL";
+    try {
+      
+        const params = "qgMCZGG6AwoI5tiC0qjb9sRrugMKCNPa26_4mbGDJboDCgjYjIz7k73C8X26AwsIsuTT3PDW45rJAboDCgj_neig0riToyG6AwsI4Ifex42A0rbBAboDCwiBv8K9jND2_LkBugMLCJ6Oxdqf5r_QugG6AwsIiLTcqYLIvozQAboDCgi54P_p4OqE13m6AwsIkNCS1LL";
 
-              if (!params || params.trim() === "") {
-                  throw new Error('"params" must be a non-empty string.');
-              }
-
-              const response = await axios.post(
-                  "https://www.youtube.com/youtubei/v1/next",
-                  {
-                      context: {
-                          client: {
-                            clientName: 'TVHTML5',
-                            clientVersion: '5.20150715',
-                            screenWidthPoints: 600,
-                            screenHeightPoints: 275,
-                            screenPixelDensity: 2,
-                            theme: 'CLASSIC',
-                            webpSupport: false,
-                            acceptRegion: 'US',
-                            acceptLanguage: 'en-US',
-                        },
-                        user: {
-                            enableSafetyMode: false,
-                        },
-                      },
-                      params: params,
-                      videoId: videoId,
-                  },
-                  {
-                      headers: {
-                          "Content-Type": "application/json",
-                          "Origin": "https://www.youtube.com/",
-                          "Referer": "https://www.youtube.com/tv/",
-                          "User-Agent": "Mozilla/5.0"
-                      }
-                  }
-              );
-
-              const sections = response.data.contents?.singleColumnWatchNextResults?.results?.results?.contents;
-              if (!sections || sections.length < 2) {
-                  console.error("Failed to find the correct itemSectionRenderer.");
-                  return null;
-              }
-
-              const secondSection = sections[1]?.itemSectionRenderer?.contents;
-              if (!secondSection) {
-                  console.error("Second itemSectionRenderer is missing.");
-                  return null;
-              }
-
-              const ownerData = secondSection.find(item => item.videoOwnerRenderer);
-              if (!ownerData || !ownerData.videoOwnerRenderer) {
-                  console.error("Failed to find video owner data.");
-                  return null;
-              }
-
-              const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop().url; // Highest resolution
-
-              console.log(`Video ID: ${videoId}`);
-              console.log(`Profile Picture URL: ${pfpUrl}`);
-
-              return pfpUrl;
-          } catch (error) {
-              console.error("Error fetching profile picture:", error);
-          }
-      }
-    
-     
-
-      static async convertToIntermediateFormBrowse(responseData) {
-        const videos = [];
-    
-        console.log("items yap", JSON.stringify(responseData));
-    
-        const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.twoColumnRenderer?.rightColumn?.playlistVideoListRenderer?.contents;
-    
-        if (Array.isArray(items)) {
-
-            const allPromises = items.map(async item => {
-                const video = item?.tileRenderer;
-    
-                if (video) {
-          
-                    const publishedText = video.metadata?.tileMetadataRenderer?.lines
-                        ?.find(line => line.lineRenderer?.items
-                            ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))?.lineRenderer?.items
-                        ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
-                        ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
-    
-                    const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
-    
-                    const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
-                        ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
-                        ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
-                    const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
-    
-                    const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "John Doe";
-    
-                    const pfpUrl = await FeedsApiVideos.getProfilePicture(video.onSelectCommand?.watchEndpoint?.videoId) 
-                        || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Default pfp if the API fails to return one
-    
-                    const videoData = {
-                        id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
-                        author: authorText,
-                        title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
-                        etag: video.etag || "null",
-                        published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
-                        updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
-                        category: video.category || "Unknown Category",
-                        categoryLabel: video.categoryLabel || "Unknown Category Label",
-                        seconds: formatteddurationText,
-                        pfp: pfpUrl
-                    };
-    
-                    videos.push(videoData);
-                }
-            });
-    
-            await Promise.all(allPromises);
-        } else {
-            console.error("No items found in responseData.");
+        if (!params || params.trim() === "") {
+            throw new Error('"params" must be a non-empty string.');
         }
-    
-        return videos;
+
+        const response = await axios.post(
+            "https://www.youtube.com/youtubei/v1/next",
+            {
+                context: {
+                    client: {
+                      clientName: 'TVHTML5',
+                      clientVersion: '5.20150715',
+                      screenWidthPoints: 600,
+                      screenHeightPoints: 275,
+                      screenPixelDensity: 2,
+                      theme: 'CLASSIC',
+                      webpSupport: false,
+                      acceptRegion: 'US',
+                      acceptLanguage: 'en-US',
+                  },
+                  user: {
+                      enableSafetyMode: false,
+                  },
+                },
+                params: params,
+                videoId: videoId,
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Origin": "https://www.youtube.com/",
+                    "Referer": "https://www.youtube.com/tv/",
+                    "User-Agent": "Mozilla/5.0"
+                }
+            }
+        );
+
+        const sections = response.data.contents?.singleColumnWatchNextResults?.results?.results?.contents;
+        if (!sections || sections.length < 2) {
+            console.error("Failed to find the correct itemSectionRenderer.");
+            return null;
+        }
+
+        const secondSection = sections[1]?.itemSectionRenderer?.contents;
+        if (!secondSection) {
+            console.error("Second itemSectionRenderer is missing.");
+            return null;
+        }
+
+        const ownerData = secondSection.find(item => item.videoOwnerRenderer);
+        if (!ownerData || !ownerData.videoOwnerRenderer) {
+            console.error("Failed to find video owner data.");
+            return null;
+        }
+
+        const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop().url; 
+
+        console.log(`Video ID: ${videoId}`);
+        console.log(`Profile Picture URL: ${pfpUrl}`);
+
+        return pfpUrl;
+    } catch (error) {
+        console.error("Error fetching profile picture:", error);
     }
-    
+}
+
+
+    static async convertToIntermediateFormBrowse(responseData) {
+      const videos = [];
+  
+      console.log("items yap", JSON.stringify(responseData));
+  
+      const shelfRenderers = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents;
+  
+      if (!Array.isArray(shelfRenderers)) {
+          console.error("No shelfRenderers found in responseData.");
+          return videos;
+      }
+  
+      const videoPromises = shelfRenderers.flatMap(shelf => {
+          const items = shelf?.shelfRenderer?.content?.horizontalListRenderer?.items;
+          if (!Array.isArray(items)) {
+              console.warn("No items found in shelfRenderer.");
+              return [];
+          }
+  
+          return items.map(async (item) => {
+              const video = item?.tileRenderer;
+              if (!video) return null;
+  
+              console.log("Extracted Video:", JSON.stringify(video));
+  
+              const publishedText = video.metadata?.tileMetadataRenderer?.lines
+                  ?.find(line => line.lineRenderer?.items
+                      ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
+                  ?.lineRenderer?.items
+                  ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
+                  ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
+  
+              const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
+                  ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
+                  ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
+  
+              const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
+                  || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
+                  || "John Doe";
+  
+              const videoId = video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID";
+  
+              const pfpUrlPromise = this.getProfilePicture(videoId).catch(error => {
+                  console.error(`Failed to fetch profile picture for Video ID: ${videoId}`, error);
+                  return "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Default profile picture
+              });
+  
+              const [pfpUrl, formattedPublishedTime, formattedDurationText] = await Promise.all([
+                  pfpUrlPromise,
+                  FeedsApiVideos.convertRelativeDate(publishedText),
+                  FeedsApiVideos.convertTimeToSeconds(durationText)
+              ]);
+  
+              return {
+                  id: videoId,
+                  author: authorText,
+                  title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
+                  etag: video.etag || "null",
+                  published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
+                  updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
+                  category: video.category || "Unknown Category",
+                  categoryLabel: video.categoryLabel || "Unknown Category Label",
+                  seconds: formattedDurationText,
+                  pfp: pfpUrl
+              };
+          });
+      });
+  
+      const resolvedVideos = await Promise.all(videoPromises);
+      return resolvedVideos.filter(video => video !== null);
+    }
     
     static async generateVideoTemplate(parsedVideoData) {
       
@@ -408,12 +527,12 @@ class FeedsApiVideos {
                   {
                     "rel": "http://gdata.youtube.com/schemas/2007#uploader",
                     "type": "application/atom+xml",
-                    "href": "http://gdata.youtube.com/feeds/api/users/${pfpURL}"
+                    "href": "http://gdata.youtube.com/feeds/api/users/jmJDM5pRKbUlVIzDYYWb6g?v=2"
                   },
                   {
                     "rel": "self",
                     "type": "application/atom+xml",
-                    "href": "http://gdata.youtube.com/feeds/api/videos/ufsrgE0BYf0?v=2"
+                    "href": "http://gdata.youtube.com/feeds/api/videos/${pfpURL}"
                   }
                 ],
                 "author": [
@@ -609,9 +728,10 @@ class FeedsApiVideos {
             return res.status(418).json({ error: "Missing access_token in request." });
         }
         
-        let videoData;
-
-        videoData = await FeedsApiVideos.handleWatchLaterRequest(req, res, accessToken);
+        let videoData; 
+ 
+        videoData = await FeedsApiVideos.handleRecommendationsRequest(req, res, accessToken);
+     
 
         if (videoData.length === 0) {
             return res.status(404).send("No videos found.");
@@ -726,7 +846,6 @@ class FeedsApiVideos {
     }
 }
 
-router.get('/feeds/api/users/default/watch_later', FeedsApiVideos.getVideos);
-
+router.get('/feeds/api/users/default/recommendations', FeedsApiVideos.getVideos);
 
 module.exports = router;

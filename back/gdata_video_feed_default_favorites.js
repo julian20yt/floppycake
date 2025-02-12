@@ -93,7 +93,7 @@ class FeedsApiVideos {
         return now.toISOString(); 
     }
     
-    static async handleRecommendationsRequest(req, res, accessToken) {
+    static async handleFavouritesRequest(req, res, accessToken) {
 
 
         const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
@@ -155,7 +155,7 @@ class FeedsApiVideos {
             }
         };
 
-        postData.browseId = "FEwhat_to_watch";
+        postData.browseId = "VLLL";
 
             
         const headers = {
@@ -180,7 +180,7 @@ class FeedsApiVideos {
             }
     
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const logFilePath = path.join(logsDir, `recommended-browse-response-${timestamp}.json`);
+            const logFilePath = path.join(logsDir, `favourite-browse-response-${timestamp}.json`);
             fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
     
             let intermediateForm;
@@ -545,7 +545,7 @@ class FeedsApiVideos {
         
         let videoData;
 
-        videoData = await FeedsApiVideos.handleRecommendationsRequest(req, res, accessToken);
+        videoData = await FeedsApiVideos.handleFavouritesRequest(req, res, accessToken);
 
         if (videoData.length === 0) {
             return res.status(404).send("No videos found.");
@@ -660,8 +660,7 @@ class FeedsApiVideos {
     }
 }
 
-router.get('/feeds/api/users/default/recommendations', FeedsApiVideos.getVideos);
-router.get('/feeds/api/users/default/river', FeedsApiVideos.getVideos);
- 
+router.get('/feeds/api/users/default/favorites', FeedsApiVideos.getVideos);
+
 
 module.exports = router;
