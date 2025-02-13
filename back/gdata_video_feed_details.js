@@ -108,6 +108,7 @@ class FeedsApiVideos {
         let userName = "";
         let title = "";
         let date = "";
+        let browseId = "";
 
         if (nextData &&
             nextData.contents &&
@@ -125,6 +126,8 @@ class FeedsApiVideos {
            
             avatarUrl = nextData.contents.singleColumnWatchNextResults.results.results.contents[1].itemSectionRenderer.contents[0].videoOwnerRenderer.thumbnail.thumbnails[0].url;
            
+            browseId = nextData.contents.singleColumnWatchNextResults.results.results.contents[1].itemSectionRenderer.contents[0].videoOwnerRenderer.navigationEndpoint.browseEndpoint.browseId;
+
             userName = nextData.contents.singleColumnWatchNextResults.results.results.contents[1].itemSectionRenderer.contents[0].videoOwnerRenderer.title.runs[0].text;
 
             title = video.title && video.title.runs && video.title.runs[0] ? video.title.runs[0].text : 'Unknown Title';
@@ -279,7 +282,7 @@ class FeedsApiVideos {
             ],
             "media$credit": [
                 {
-                "$t": "warnerbrospictures",
+                "$t": "${browseId}",
                 "role": "uploader",
                 "scheme": "urn:youtube",
                 "yt$display": "${userName}",

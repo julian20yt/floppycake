@@ -21,6 +21,13 @@ const gdataVideoFeedRealated = require('./gdata_video_feed_related');
 const gdataVideoFeedDefaultWhatToWatch = require('./gdata_video_feed_default_what_to_watch');
 const gdataVideoFeedDefaultWatchHistory = require('./gdata_video_feed_default_watch_history.js');
 
+const gdataVideoFeedUserUploads = require('./gdata_video_feed_user_uploads');
+const gdataVideoFeedUserInfo = require('./gdata_video_feed_user_info');
+
+const gdataVideoFeedDefaultUserSubs = require('./gdata_video_feed_default_newsubscriptionvideos');
+
+const gdataVideoFeedDefaultEvents = require('./gdata_video_feed_default_events');
+
 
 const { handleGetVideoInfo } = require('./get_video_info');
 
@@ -282,8 +289,22 @@ app.use(gdataVideoFeedDefaultFavorites);
 //for what to watch
 app.use(gdataVideoFeedDefaultWhatToWatch);
 
+//for user subs 
+app.use(gdataVideoFeedDefaultUserSubs);
+
 //for whatch history
 app.use(gdataVideoFeedDefaultWatchHistory);
+
+//for events
+app.use(gdataVideoFeedDefaultEvents);
+
+//for user uploads (non default)
+app.use(gdataVideoFeedUserUploads);
+
+//for user info (non default)
+app.use(gdataVideoFeedUserInfo);
+
+
 
 
 

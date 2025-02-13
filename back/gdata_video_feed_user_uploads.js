@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
+const { title } = require('process');
 const router = express.Router();
 
 
@@ -93,7 +94,7 @@ class FeedsApiVideos {
         return now.toISOString(); 
     }
     
-    static async handleWatchLaterRequest(req, res, accessToken) {
+    static async handleBrowseRequst(req, res, username) {
 
 
         const apiKey = 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8';
@@ -155,17 +156,13 @@ class FeedsApiVideos {
             }
         };
 
-        postData.browseId = "FEmy_videos";
+        postData.browseId = username;
 
             
         const headers = {
           'Content-Type': 'application/json',
         };
 
-        if (accessToken) {
-            headers['Authorization'] = `Bearer ${accessToken}`;
-        }
-    
         try {
             const response = await axios.post(apiUrl, postData, {
                 headers,
@@ -180,12 +177,12 @@ class FeedsApiVideos {
             }
     
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const logFilePath = path.join(logsDir, `uploads-browse-response-${timestamp}.json`);
+            const logFilePath = path.join(logsDir, `uploads-user-response-${timestamp}.json`);
             fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
     
             let intermediateForm;
             try {
-                intermediateForm = await this.convertToIntermediateFormBrowse(response.data);
+                intermediateForm = await this.convertToIntermediateFormBrowse(response.data, username);
             } catch (convertError) {
                 console.error("Error converting API response to intermediate form:", convertError);
                 throw new Error('Failed to process API response.');
@@ -202,13 +199,13 @@ class FeedsApiVideos {
         }
     }
 
-    static async convertToIntermediateFormBrowse(responseData) {
+    static async convertToIntermediateFormBrowse(responseData, browseId) {
         const videos = [];
     
         console.log("items yap", JSON.stringify(responseData));
-    
-        const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.gridRenderer?.items;
-    
+        
+        const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
+
         if (Array.isArray(items)) {
             for (const item of items) {
                 const video = item?.tileRenderer;
@@ -247,7 +244,8 @@ class FeedsApiVideos {
                         category: video.category || "Unknown Category",
                         categoryLabel: video.categoryLabel || "Unknown Category Label",
                         seconds: formatteddurationText,
-                        pfp: pfpUrl
+                        pfp: pfpUrl,
+                        browseId: browseId
                     };
     
                     videos.push(videoData);
@@ -280,6 +278,7 @@ class FeedsApiVideos {
 
         const pfpURL = parsedVideoData.pfp || `null`;
 
+        const username = parsedVideoData.browseId || `null`;
     
         const videoTemplate = `
             {
@@ -335,7 +334,7 @@ class FeedsApiVideos {
                   {
                     "rel": "http://gdata.youtube.com/schemas/2007#uploader",
                     "type": "application/atom+xml",
-                    "href": "http://gdata.youtube.com/feeds/api/users/jmJDM5pRKbUlVIzDYYWb6g?v=2"
+                    "href": "http://gdata.youtube.com/feeds/api/users/${pfpURL}"
                   },
                   {
                     "rel": "self",
@@ -349,7 +348,7 @@ class FeedsApiVideos {
                       "$t": "${author}"
                     },
                     "uri": {
-                      "$t": "http://gdata.youtube.com/feeds/api/users/WarnerBrosPictures"
+                      "$t": "http://gdata.youtube.com/feeds/api/users/${username}"
                     },
                     "yt$userId": {
                       "$t": "${pfpURL}"
@@ -408,7 +407,7 @@ class FeedsApiVideos {
                   ],             
                   "media$credit": [
                     {
-                      "$t": "warnerbrospictures",
+                      "$t": "${username}",
                       "role": "uploader",
                       "scheme": "urn:youtube",
                       "yt$display": "${author}",
@@ -455,21 +454,21 @@ class FeedsApiVideos {
                       "yt$name": "sddefault"
                     },
                     {
-                      "url": "http://i.ytimg.com/vi/${id}/1.jpg",
+                      "url": "${pfpURL}",
                       "height": 90,
                       "width": 120,
                       "time": "00:00:22.750",
                       "yt$name": "start"
                     },
                     {
-                      "url": "http://i.ytimg.com/vi/${id}/2.jpg",
+                      "url": "${pfpURL}",
                       "height": 90,
                       "width": 120,
                       "time": "00:00:45.500",
                       "yt$name": "middle"
                     },
                     {
-                      "url": "http://i.ytimg.com/vi/${id}/3.jpg",
+                      "url": "${pfpURL}",
                       "height": 90,
                       "width": 120,
                       "time": "00:01:08.250",
@@ -490,7 +489,7 @@ class FeedsApiVideos {
                     "$t": "${published}"
                   },
                   "yt$uploaderId": {
-                    "$t": "UCjmJDM5pRKbUlVIzDYYWb6g"
+                    "$t": "${pfpURL}"
                   },
                   "yt$videoid": {
                     "$t": "${id}"
@@ -530,15 +529,19 @@ class FeedsApiVideos {
 
     static async getVideos(req, res) {
 
-        const accessToken = req.query.access_token;
+        var username = req.params.username;
 
-        if (!accessToken) {
-            return res.status(418).json({ error: "Missing access_token in request." });
+        if (!username) {
+            return res.status(418).json({ error: "Missing username in request." });
+        }
+
+        if (!username.startsWith("UC")) {
+          username = "UC" + username;
         }
         
         let videoData;
 
-        videoData = await FeedsApiVideos.handleWatchLaterRequest(req, res, accessToken);
+        videoData = await FeedsApiVideos.handleBrowseRequst(req, res, username);
 
         if (videoData.length === 0) {
             return res.status(404).send("No videos found.");
@@ -573,7 +576,7 @@ class FeedsApiVideos {
             }
             ],
             "title": {
-            "$t": ""
+            "$t": "${title}"
             },
             "logo": {
             "$t": "http://www.youtube.com/img/pic_youtubelogo_123x63.gif"
@@ -632,7 +635,7 @@ class FeedsApiVideos {
             "$t": 1
             },
             "openSearch$itemsPerPage": {
-            "$t": 7
+            "$t": ${numberOfResults}
             },
           
             ${formattedVideoList} 
@@ -653,7 +656,13 @@ class FeedsApiVideos {
     }
 }
 
-router.get('/feeds/api/users/default/uploads', FeedsApiVideos.getVideos);
+router.get('/feeds/api/users/:username/uploads', (req, res) => {
+  const username = req.params.username;
+  
+  if (username === "default") return; // Ignore "default" since it's handled elsewhere
+
+  FeedsApiVideos.getVideos(req, res);
+});
 
 
 module.exports = router;

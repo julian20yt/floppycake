@@ -9170,9 +9170,11 @@ console.log("PROXY_URL:", PROXY_URL);
                         }
                     }
                 }, 1000);
-                loadSegment(3);     
+                loadSegment(5);     
             }
     
+
+            
         
           // --- End fetchSegment function ---
       

@@ -280,9 +280,9 @@ class FeedsApiVideos {
 
       static async convertToIntermediateFormBrowse(responseData) {
           const videos = [];
-      
-          const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
-      
+   
+          const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[1]?.shelfRenderer?.content?.horizontalListRenderer?.items;
+
           if (Array.isArray(items)) {
               for (const item of items) {
                   const video = item.tileRenderer;

@@ -5978,6 +5978,7 @@
                 Qq: "transport-search-button",
                 al: "transport-subscribe-button"
             },
+            
             Jb = {
                 FRIEND_ADDED: "[[{{username}} added a friend|The message that describes user activity. Displayed when a user has added a friend.]]",
                 USER_SUBSCRIPTION_ADDED: "[[{{username}} added a subscription|The message that describes user activity. Displayed when a user subscribed to a channel.]]",
@@ -10975,7 +10976,7 @@
             var c = new Te(a.Ia, a.serviceQuery, a.eb),
                 e = new cc(a.Ia, a.serviceQuery);
             if (this.QH(b)) return this.HH(c, b), this.GH(e, b), c.channel = e, c;
-            c.Um = this.ko();
+            c.Um = this.ko(a, b);
             c.description = this.LH(b);
             c.channel = this.KH(e, b);
             c.duration = this.Yv(b);
@@ -11027,9 +11028,40 @@
         d.YO = function(a) {
             if (a && a.yt$rating && a.yt$rating.numLikes) return parseInt(a.yt$rating.numLikes, 10)
         };
-        d.ko = function() {
-            return "[[{{username}} uploaded a video|The message that describes user activity. Displayed when a user has uploaded a video.]]"
+
+
+        d.Jb = {
+            FRIEND_ADDED: "[[{{username}} added a friend|The message that describes user activity. Displayed when a user has added a friend.]]",
+            USER_SUBSCRIPTION_ADDED: "[[{{username}} added a subscription|The message that describes user activity. Displayed when a user subscribed to a channel.]]",
+            VIDEO_ADDED_TO_LEGO: "[[{{username}} added a video|The message that describes user activity. Displayed when a user added a video to a playlist.]]",
+            VIDEO_ADDED_TO_PLAYLIST: "[[{{username}} added a video to a playlist|The message that describes user activity. Displayed when a user added a video to a playlist.]]",
+            VIDEO_COMMENTED: "[[{{username}} commented a video|The message that describes user activity. Displayed when a user has commented on a video.]]",
+            VIDEO_FAVORITED: "[[{{username}} favorited a video|The message that describes user activity. Displayed when a user has favorited a video.]]",
+            VIDEO_RATED: "[[{{username}} rated a video|The message that describes user activity. Displayed when a user has rated a video.]]",
+            VIDEO_RECOMMENDED: "[[video recommended|The message that describes that a video has been recommended.]]",
+            VIDEO_SHARED: "[[{{username}} shared a video|The message that describes user activity. Displayed when a user has shared a video.]]",
+            VIDEO_UPLOADED: "[[{{username}} uploaded a video|The message that describes user activity. Displayed when a user has uploaded a video.]]"
         };
+
+
+        d.ko = function(a, b) {
+            console.log("Yap Dollar A properties:", Object.keys(a));
+            console.log("Yap Dollar B properties:", Object.keys(b));
+        
+            console.log("Yap Dollar - category:", a.category);
+            console.log("Yap Dollar 2 - category:", b.category);
+        
+            const bTerm = b.category && b.category[1] && b.category[1].term;
+            const capitalizedTerm = bTerm ? bTerm.toUpperCase() : null;
+        
+            if (capitalizedTerm && this.Jb[capitalizedTerm]) {
+                return this.Jb[capitalizedTerm]; 
+            }
+
+            return "[[{{username}} uploaded a video|The message that describes user activity. Displayed when a user has uploaded a video.]]";
+        };
+        
+
         d.JH = function(a) {
             return a && a.media$group && a.media$group.yt$uploaded ? new Date(this.fa(a.media$group.yt$uploaded)) : null
         };
@@ -23279,7 +23311,6 @@
                     name: "activityService",
                     listType: "AF",
                     path: "/users/{userName}/events",
-                    parser: "activityParser",
                     paramKey: "userName",
                     params: {
                         fields: "title,logo,entry[$inline-filter],openSearch:totalResults",
