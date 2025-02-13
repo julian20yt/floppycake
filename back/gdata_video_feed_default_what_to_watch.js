@@ -180,7 +180,7 @@ class FeedsApiVideos {
             }
     
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const logFilePath = path.join(logsDir, `recommended-browse-response-${timestamp}.json`);
+            const logFilePath = path.join(logsDir, `what-to-watch-browse-response-${timestamp}.json`);
             fs.writeFileSync(logFilePath, JSON.stringify(response.data, null, 2)); 
     
             let intermediateForm;
@@ -725,21 +725,21 @@ class FeedsApiVideos {
                       "yt$name": "sddefault"
                     },
                     {
-                      "url": "${pfpURL}",
+                      "url": "https://i.ytimg.com/sb/lED5XdHdNMc/storyboard3_L0/default.jpg?sqp=-oaymwENSDfyq4qpAwVwAcABBqLzl_8DBgji6b-8Bg==&sigh=rs$AOn4CLDT3Ekl3CvXX1gVvESsl9fLTXeLiA",
                       "height": 90,
                       "width": 120,
                       "time": "00:00:22.750",
                       "yt$name": "start"
                     },
                     {
-                      "url": "${pfpURL}",
+                      "url": "https://i.ytimg.com/sb/lED5XdHdNMc/storyboard3_L0/default.jpg?sqp=-oaymwENSDfyq4qpAwVwAcABBqLzl_8DBgji6b-8Bg==&sigh=rs$AOn4CLDT3Ekl3CvXX1gVvESsl9fLTXeLiA",
                       "height": 90,
                       "width": 120,
                       "time": "00:00:45.500",
                       "yt$name": "middle"
                     },
                     {
-                      "url": "${pfpURL}",
+                      "url": "https://i.ytimg.com/sb/lED5XdHdNMc/storyboard3_L0/default.jpg?sqp=-oaymwENSDfyq4qpAwVwAcABBqLzl_8DBgji6b-8Bg==&sigh=rs$AOn4CLDT3Ekl3CvXX1gVvESsl9fLTXeLiA",
                       "height": 90,
                       "width": 120,
                       "time": "00:01:08.250",

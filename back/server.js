@@ -19,6 +19,7 @@ const gdataVideoFeedDefaultRecommendations = require('./gdata_video_feed_default
 const gdataVideoFeedDefaultUploads = require('./gdata_video_feed_default_uploads');
 const gdataVideoFeedRealated = require('./gdata_video_feed_related');
 const gdataVideoFeedDefaultWhatToWatch = require('./gdata_video_feed_default_what_to_watch');
+const gdataVideoFeedDefaultWatchHistory = require('./gdata_video_feed_default_watch_history.js');
 
 
 const { handleGetVideoInfo } = require('./get_video_info');
@@ -167,12 +168,54 @@ app.get('/api/lounge/bc/test', async (req, res) => {
     }
 });
 
+
 app.post('/api/lounge/bc/bind', async (req, res) => {
     const requestUrl = 'https://www.youtube.com/api/lounge/bc/bind';
 
+    // Extract loungeIdToken from the incoming request
+    const loungeIdToken = req.query.loungeIdToken;
+    
+    if (!loungeIdToken) {
+        return res.status(400).json({ error: 'Missing loungeIdToken' });
+    }
+
+    // Define fixed parameters
+    const fixedData = new URLSearchParams({
+        device: "LOUNGE_SCREEN",
+        id: "2fb2dd96-3cef-4aeb-89af-e95dc788cf5b",
+        obfuscatedGaiaId: "105573250621405559873",
+        name: "YouTube on TV",
+        app: "lb-v4",
+        theme: "cl",
+        capabilities: "dsp,mic,dpa,ntb,pas,dcn,dcp,drq,isg,els",
+        cst: "m",
+        mdxVersion: "2",
+        loungeIdToken: loungeIdToken,  // Use the provided loungeIdToken
+        zx: "afuz9z750nc9",
+        VER: "8",
+        v: "2",
+        deviceInfo: JSON.stringify({
+            brand: "Samsung",
+            model: "SmartTV",
+            year: 0,
+            os: "Tizen",
+            osVersion: "5.0",
+            chipset: "",
+            clientName: "TVHTML5",
+            dialAdditionalDataSupportLevel: "unsupported",
+            mdxDialServerType: "MDX_DIAL_SERVER_TYPE_UNKNOWN",
+            hasIdentityDifferentFromCurrent: false,
+            switchableIdentitiesSuffix: ""
+        }),
+        RID: "75851",
+        AID: "3",
+        gsessionid: "T5YfRxt76sU7YzilWLbBJEzS2jOm7DHm6cup0mU04bM",
+        t: "1"
+    });
+
     try {
-        const response = await axios.post(requestUrl, null, {
-            params: req.query, 
+        const response = await axios.post(requestUrl, fixedData.toString(), {
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
         });
 
         res.json(response.data);
@@ -238,6 +281,10 @@ app.use(gdataVideoFeedDefaultFavorites);
 
 //for what to watch
 app.use(gdataVideoFeedDefaultWhatToWatch);
+
+//for whatch history
+app.use(gdataVideoFeedDefaultWatchHistory);
+
 
 
 // Start the server

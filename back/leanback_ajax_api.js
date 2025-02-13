@@ -116,7 +116,8 @@ router.get('/leanback_ajax', (req, res) => {
                     "gdata_url": "http://gdata.youtube.com/feeds/api/users/Y30JRSgfhYXA6i6xX1erWg/uploads",
                     "title": "Smosh",
                     "tab": "featured",
-                    "gdata_list_id": "UUY30JRSgfhYXA6i6xX1erWg"
+                    "gdata_list_id": "UUY30JRSgfhYXA6i6xX1erWg",
+                    "thumbnail": "http://i1.ytimg.com/vi/1b1loWJfxaA/hqdefault.jpg"
                 },
                 {
                     "gdata_url": "http://gdata.youtube.com/feeds/api/users/aBf1a-dpIsw8OxqH4ki2Kg/uploads",

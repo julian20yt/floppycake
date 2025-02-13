@@ -8377,6 +8377,10 @@
         d.xN = function() {
             this.Lm = !(!this.Ib && !this.Ca);
             this.de = "YouTube Leanback";
+
+            console.log("Ib " + this.Ib);
+            console.log("Ca " + this.Ca);
+
             switch (this.Ib && this.Ib.toLowerCase()) {
                 case "boxee":
                     this.Mm = !0;
@@ -15606,7 +15610,7 @@
                 this.kl = a || null;
                 this.Zh = b || 0;
                 a = this.kw + "/test";
-                b = PROXY_URL + "/https://youtube.com/api/lounge/bc/bind";
+                b = APP_URL + "/api/lounge/bc/bind";
                 var e = new Ji("1", c ? c.firstTestResults : null, c ? c.secondTestResults : null),
                     f = this.oa;
                 f && f.Mw(null);

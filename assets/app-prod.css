@@ -1,18 +1,18 @@
 @font-face {
   font-family: 'roboto-condensed-regular';
-  src: url('../assets/RobotoCondensed-Regular.ttf') format('truetype')
+  src: url('/RobotoCondensed-Regular.ttf') format('truetype')
 }
 
 @font-face {
   font-family: 'roboto-light';
-  src: url('../assets/Roboto-Light.ttf') format('truetype')
+  src: url('/Roboto-Light.ttf') format('truetype')
 }
 
 @font-face {
   font-family: 'youtube-icons';
   font-style: normal;
   font-weight: normal;
-  src: url('../assets/youtube-icons.ttf') format('truetype')
+  src: url('/youtube-icons.ttf') format('truetype')
 }
   
 

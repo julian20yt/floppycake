@@ -8807,316 +8807,373 @@ console.log("PROXY_URL:", PROXY_URL);
         console.log("mediaLinks parameters:", mediaLinks);
         Cm.call(this);
         console.log("Cm constructor called");
-      
+    
         this.g = this.b = null;
         this.B = b;
-      
-        if (!window.MediaSource) {
-          console.error("MediaSource API is not supported.");
-          return;
-        }
-      
-        console.log("Using MediaSource API");
+    
 
-        if (window.MediaSource) {
-            this.o = new MediaSource(); 
-            console.log("MediaSource is supported");
-        } else if (window.WebKitMediaSource) {
-            this.o = new WebKitMediaSource(); // 
-            console.log("WebKitMediaSource is supported (Safari fallback)");
-        } else {
-            console.error("MediaSource is not supported by this browser.");
-        }
+
+        if (!window.MediaSource && !window.WebKitMediaSource) {
+            console.error("MediaSource API is not supported. Falling back to separate video and audio elements.");
         
-        console.log("Created MediaSource object:", this.o);
+            var videoElement = document.querySelector(".html5-main-video");
+            var audioElement = document.createElement("audio");
+        
+            if (!videoElement) {
+                console.error("Video element not found!");
+                return;
+            }
+        
+            function getBestVideoUrl(mediaLinks, supportsVP9) {
+                var validVideoLinks = mediaLinks.filter(function (link) {
+                    return link.type && (supportsVP9 ? link.type === 'video/webm' : link.type === 'video/mp4');
+                });
+        
+                if (validVideoLinks.length === 0) {
+                    console.error('No valid video formats found.');
+                    return null;
+                }
+        
+                var filteredVideoLinks = validVideoLinks.filter(function (link) {
+                    var resolution = link.resolution.split('x');
+                    var height = parseInt(resolution[1], 10);
+                    return height <= 720;
+                });
+        
+                if (filteredVideoLinks.length === 0) {
+                    console.error('No video formats found with resolution <= 720p.');
+                    return null;
+                }
+        
+                var sortedVideoLinks = filteredVideoLinks.sort(function (a, b) {
+                    return parseInt(b.resolution.split('x')[1]) - parseInt(a.resolution.split('x')[1]);
+                });
+        
+                console.log('Best video URL found:', sortedVideoLinks[0].url);
+                var proxyVideoUrl = PROXY_URL + '/' + sortedVideoLinks[0].url;
+                console.log('Proxy Video URL:', proxyVideoUrl);
+        
+                return {
+                    url: proxyVideoUrl,
+                    mimeType: supportsVP9 ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.4d401e"'
+                };
+            }
+        
+            function getAudioUrl(mediaLinks, supportsVP9) {
+                var supportsOpus = supportsVP9 && MediaSource.isTypeSupported && MediaSource.isTypeSupported('audio/webm; codecs="opus"');
+        
+                console.log('Received media links:', mediaLinks);
+                console.log(supportsOpus ? "Browser supports Opus (WebM Audio)" : "Browser does not support Opus, falling back to AAC (MP4 Audio)");
+        
+                var validAudioLinks = [];
+                for (var i = 0; i < mediaLinks.length; i++) {
+                    var link = mediaLinks[i];
+                    if (link.type && ((supportsOpus && link.type === 'audio/webm') || (!supportsOpus && link.type === 'audio/mp4'))) {
+                        validAudioLinks.push(link);
+                    }
+                }
+        
+                if (validAudioLinks.length === 0) {
+                    console.error('No valid audio formats found.');
+                    return null;
+                }
+        
+                var bestAudio = validAudioLinks[0]; 
+        
+                console.log('Audio URL found:', bestAudio.url);
+                var proxyAudioUrl = PROXY_URL + '/' + bestAudio.url;
+                console.log('Proxy Audio URL:', proxyAudioUrl);
+        
+                return {
+                    url: proxyAudioUrl,
+                    mimeType: supportsOpus ? 'audio/webm; codecs="opus"' : 'audio/mp4; codecs="mp4a.40.2"'
+                };
+            }
+        
+            videoElement.src = getBestVideoUrl(mediaLinks).url;
+            audioElement.src = getAudioUrl(mediaLinks).url;
+        
+            audioElement.controls = true;  
+        
+            var videoContainer = document.querySelector('.html5-video-container');
+            videoContainer.appendChild(audioElement);
+        
+            function syncAudioAndVideo() {
+                if (videoElement.paused || audioElement.paused) return;  
+        
+                if (Math.abs(videoElement.currentTime - audioElement.currentTime) > 0.1) {
+                    audioElement.currentTime = videoElement.currentTime;
+                }
+            }
+        
+            videoElement.play();
+            audioElement.play();
+        
+            videoElement.addEventListener('error', function () {
+                console.error("Error playing video.");
+            });
+        
+            audioElement.addEventListener('error', function () {
+                console.error("Error playing audio.");
+            });
+        
+            videoElement.addEventListener('play', function () {
+                console.log("Video playback started.");
+            });
+        
+            audioElement.addEventListener('play', function () {
+                console.log("Audio playback started.");
+            });
+        
+            setInterval(syncAudioAndVideo, 100);
+        
+            videoElement.addEventListener('pause', function () {
+                console.log("Video paused. Pausing audio...");
+                audioElement.pause(); 
+            });
+        
+            videoElement.addEventListener('play', function () {
+                console.log("Video playing. Resuming audio...");
+                audioElement.play(); 
+            });
+        
+            return;  
+        } else {
+            console.log("Using MediaSource API, your browser supports it yay!");
+        }
       
+    
+        console.log("Using MediaSource API");
+    
+        // Use MediaSource or WebKitMediaSource for browser compatibility
+        this.o = window.MediaSource ? new MediaSource() : new WebKitMediaSource();
+        console.log("Created MediaSource object:", this.o);
+    
         var videoElement = document.querySelector(".html5-main-video");
         if (!videoElement) {
-          console.error("Video element not found!");
-          return;
+            console.error("Video element not found!");
+            return;
         }
         videoElement.src = URL.createObjectURL(this.o);
         console.log("Assigned MediaSource to video element:", videoElement.src);
-      
+    
+        // Handle MediaSource API events
         this.o.addEventListener("sourceopen", function () {
-          console.log("MediaSource opened");
-          var mediaSource = this;
-          if (!mediaSource || mediaSource.readyState !== "open") {
-            console.error("MediaSource is not in the open state");
-            return;
-          }
-      
-          var supportsVP9 = MediaSource.isTypeSupported('video/webm; codecs="vp9"');
-          
-          if (!supportsVP9) {
-              console.warn("Your browser cannot play VP9, falling back to H.264");
-          } else {
-              console.log("Your browser supports VP9, yay!");
-          }      
-
-     
-          var videoData = getBestVideoUrl(mediaLinks, supportsVP9);
-          var audioData = getAudioUrl(mediaLinks, supportsVP9);
-          
-          console.log("Video MIME:", videoData.mimeType);
-          console.log("Audio MIME:", audioData.mimeType);
-      
-          var videoSourceBuffer = mediaSource.addSourceBuffer(videoData.mimeType);
-          var audioSourceBuffer = mediaSource.addSourceBuffer(audioData.mimeType);
-          console.log("Created SourceBuffers:", videoData, audioData);
-      
-          fetchSegment(videoData.url, videoSourceBuffer, videoElement, 'video');
-          fetchSegment(audioData.url, audioSourceBuffer, videoElement, 'audio');
-      
-          // --- Begin fetchSegment function ---
-          function fetchSegment(url, sourceBuffer, videoElement, type) {
-            var rangeStart = 0;
-            var chunkSize = 2 * 1024 * 1024; // 2 MB per segment
-            var rangeEnd = rangeStart + chunkSize;
-            var totalSize = Number.MAX_SAFE_INTEGER;
-            var isPaused = false;
-            var isSeeking = false;
-            var minBufferAhead = 15; // seconds minimum buffered ahead
-            var maxBufferAhead = 45; // seconds maximum buffered ahead
-            var removalMargin = 30;  // seconds to keep behind currentTime
-            var isLoading = false;
-            var pendingAppends = [];
-      
-            function loadSegment(retryCount) {
-                retryCount = typeof retryCount !== "undefined" ? retryCount : 3; // Default parameter workaround
+            console.log("MediaSource opened");
+            var mediaSource = this;
+            if (!mediaSource || mediaSource.readyState !== "open") {
+                console.error("MediaSource is not in the open state");
+                return;
+            }
+    
+            var supportsVP9 = MediaSource.isTypeSupported ? MediaSource.isTypeSupported('video/webm; codecs="vp9"') : false;
             
-                // Ensure MediaSource is still open.
-                if (mediaSource.readyState !== "open") {
-                    console.warn("MediaSource is no longer open. Aborting segment load.");
-                    return;
-                }
-            
-                // If a segment is already loading, exit.
-                if (isLoading) {
-                    console.log("Already loading a segment, skipping new load.");
-                    return;
-                }
-            
-                // Check buffer status (only for video).
-                if (sourceBuffer.buffered.length > 0) {
-                    var currentTime = videoElement.currentTime;
-                    var bufferedEnd = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
-                    var bufferedAhead = bufferedEnd - currentTime;
-                    console.log("Current buffer: " + bufferedAhead.toFixed(2) + " sec ahead");
-            
-                    // If buffer is too full, clear old data.
-                    if (bufferedAhead >= maxBufferAhead) {
-                        if (!sourceBuffer.updating) {
-                            var bufferedStart = sourceBuffer.buffered.start(0);
-                            var removalEnd = currentTime - removalMargin;
-            
-                            if (removalEnd > bufferedStart) {
-                                console.log(
-                                    "Buffer is full (" + bufferedAhead.toFixed(2) + " sec). Removing old data from " +
-                                    bufferedStart.toFixed(2) + " to " + removalEnd.toFixed(2) + "."
-                                );
-                                try {
-                                    sourceBuffer.remove(bufferedStart, removalEnd);
-                                    var onRemoval = function () {
-                                        console.log(
-                                            "Buffer removal completed from " +
-                                            bufferedStart.toFixed(2) + " to " + removalEnd.toFixed(2) + "."
-                                        );
-                                        sourceBuffer.removeEventListener("updateend", onRemoval);
-                                        setTimeout(function () { loadSegment(retryCount); }, 100);
-                                    };
-                                    sourceBuffer.addEventListener("updateend", onRemoval, false);
-                                } catch (e) {
-                                    console.error("Error removing old buffer data:", e);
+            if (!supportsVP9) {
+                console.warn("Your browser cannot play VP9, falling back to H.264");
+            } else {
+                console.log("Your browser supports VP9, yay!");
+            }
+    
+            var videoData = getBestVideoUrl(mediaLinks, supportsVP9);
+            var audioData = getAudioUrl(mediaLinks, supportsVP9);
+    
+            console.log("Video MIME:", videoData.mimeType);
+            console.log("Audio MIME:", audioData.mimeType);
+    
+            var videoSourceBuffer = mediaSource.addSourceBuffer(videoData.mimeType);
+            var audioSourceBuffer = mediaSource.addSourceBuffer(audioData.mimeType);
+            console.log("Created SourceBuffers:", videoData, audioData);
+    
+            fetchSegment(videoData.url, videoSourceBuffer, videoElement, 'video');
+            fetchSegment(audioData.url, audioSourceBuffer, videoElement, 'audio');
+    
+            // --- Begin fetchSegment function ---
+            function fetchSegment(url, sourceBuffer, videoElement, type) {
+                var rangeStart = 0;
+                var chunkSize = 2 * 1024 * 1024; // 2 MB per segment
+                var rangeEnd = rangeStart + chunkSize;
+                var totalSize = Number.MAX_SAFE_INTEGER;
+                var isPaused = false;
+                var isSeeking = false;
+                var minBufferAhead = 15; // seconds minimum buffered ahead
+                var maxBufferAhead = 45; // seconds maximum buffered ahead
+                var removalMargin = 30;  // seconds to keep behind currentTime
+                var isLoading = false;
+                var pendingAppends = [];
+    
+                function loadSegment(retryCount) {
+                    retryCount = typeof retryCount !== "undefined" ? retryCount : 3; // Default parameter workaround
+    
+                    // Ensure MediaSource is still open.
+                    if (mediaSource.readyState !== "open") {
+                        console.warn("MediaSource is no longer open. Aborting segment load.");
+                        return;
+                    }
+    
+                    // If a segment is already loading, exit.
+                    if (isLoading) {
+                        console.log("Already loading a segment, skipping new load.");
+                        return;
+                    }
+    
+                    // Check buffer status (only for video).
+                    if (sourceBuffer.buffered.length > 0) {
+                        var currentTime = videoElement.currentTime;
+                        var bufferedEnd = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                        var bufferedAhead = bufferedEnd - currentTime;
+                        console.log("Current buffer: " + bufferedAhead.toFixed(2) + " sec ahead");
+    
+                        // If buffer is too full, clear old data.
+                        if (bufferedAhead >= maxBufferAhead) {
+                            if (!sourceBuffer.updating) {
+                                var bufferedStart = sourceBuffer.buffered.start(0);
+                                var removalEnd = currentTime - removalMargin;
+    
+                                if (removalEnd > bufferedStart) {
+                                    console.log(
+                                        "Buffer is full (" + bufferedAhead.toFixed(2) + " sec). Removing old data from " +
+                                        bufferedStart.toFixed(2) + " to " + removalEnd.toFixed(2) + "."
+                                    );
+                                    try {
+                                        sourceBuffer.remove(bufferedStart, removalEnd);
+                                        var onRemoval = function () {
+                                            console.log(
+                                                "Buffer removal completed from " +
+                                                bufferedStart.toFixed(2) + " to " + removalEnd.toFixed(2) + "."
+                                            );
+                                            sourceBuffer.removeEventListener("updateend", onRemoval);
+                                            setTimeout(function () { loadSegment(retryCount); }, 100);
+                                        };
+                                        sourceBuffer.addEventListener("updateend", onRemoval, false);
+                                    } catch (e) {
+                                        console.error("Error removing old buffer data:", e);
+                                        setTimeout(function () { loadSegment(retryCount); }, 1000);
+                                    }
+                                } else {
                                     setTimeout(function () { loadSegment(retryCount); }, 1000);
                                 }
+                                return;
                             } else {
                                 setTimeout(function () { loadSegment(retryCount); }, 1000);
+                                return;
                             }
-                            return;
-                        } else {
-                            setTimeout(function () { loadSegment(retryCount); }, 1000);
-                            return;
                         }
                     }
+    
+                    if (isPaused || isSeeking) {
+                        console.log("Playback paused or seeking; delaying segment load.");
+                        return;
+                    }
+    
+                    if (rangeStart >= totalSize) {
+                        if (mediaSource.readyState === "open") {
+                            mediaSource.endOfStream();
+                            console.log("End of stream reached.");
+                        }
+                        return;
+                    }
+    
+                    isLoading = true;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.setRequestHeader('Range', 'bytes=' + rangeStart + '-' + rangeEnd);
+                    xhr.responseType = 'arraybuffer';
+    
+                    xhr.onload = function() {
+                        isLoading = false;
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            var data = xhr.response;
+                            console.log("Segment received: " + rangeStart + "-" + rangeEnd);
+                            if (data && data.byteLength > 0) {
+                                appendSegment(data, xhr);
+                            } else {
+                                console.error("Invalid data for range: " + rangeStart + "-" + rangeEnd);
+                                if (retryCount > 0) loadSegment(retryCount - 1);
+                            }
+                        } else {
+                            console.error("Failed to fetch segment, status: " + xhr.status);
+                            if (retryCount > 0) setTimeout(function() { loadSegment(retryCount - 1); }, 1000);
+                        }
+                    };
+    
+                    xhr.onerror = function() {
+                        isLoading = false;
+                        console.error("Error fetching segment:", xhr.statusText);
+                        if (retryCount > 0) {
+                            setTimeout(() => loadSegment(retryCount - 1), 2000);
+                        }
+                    };
+    
+                    xhr.send();
                 }
-                        
-              if (isPaused || isSeeking) {
-                console.log("Playback paused or seeking; delaying segment load.");
-                return;
-              }
-      
-              if (rangeStart >= totalSize) {
-                if (mediaSource.readyState === "open") {
-                  mediaSource.endOfStream();
-                  console.log("End of stream reached.");
+    
+                function appendSegment(data, xhr) {
+                    // Ensure MediaSource is still open.
+                    if (mediaSource.readyState !== "open") {
+                        console.warn("MediaSource is closed; cannot append segment.");
+                        return;
+                    }
+                    if (sourceBuffer.updating) {
+                        pendingAppends.push(() => appendSegment(data, xhr));
+                        return;
+                    }
+                    try {
+                        // remove extra old data (secondary check).
+                        if (sourceBuffer.buffered.length > 0 && videoElement) {
+                            var bufferedStart = sourceBuffer.buffered.start(0);
+                            var currentTime = videoElement.currentTime;
+                            if (currentTime - bufferedStart > 60) {
+                                var removeEnd = Math.max(currentTime - 30, bufferedStart);
+                                console.log("Removing extra old buffer from " + bufferedStart.toFixed(2) + " to " + removeEnd.toFixed(2));
+                                sourceBuffer.remove(bufferedStart, removeEnd);
+                                // resume appending when updateend fires.
+                                return;
+                            }
+                        }
+                        sourceBuffer.appendBuffer(data);
+                        console.log("Segment appended: " + rangeStart + "-" + rangeEnd);
+                        rangeStart = rangeEnd + 1;
+                        rangeEnd = rangeStart + chunkSize;
+                        var contentRange = xhr.getResponseHeader('Content-Range');
+                        if (contentRange) {
+                            totalSize = parseInt(contentRange.split('/')[1], 10);
+                        }
+                        var bufferedAhead = 0;
+                        if (sourceBuffer.buffered.length > 0) {
+                            bufferedAhead = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1) - videoElement.currentTime;
+                        }
+                        var delay = bufferedAhead > (maxBufferAhead / 2) ? 1000 : 100;
+                        setTimeout(loadSegment, delay);
+                    } catch (e) {
+                        console.error("Error appending segment:", e);
+                        setTimeout(loadSegment, 1000);
+                    }
                 }
-                return;
-              }
-      
-              isLoading = true;
-              var xhr = new XMLHttpRequest();
-              xhr.open('GET', url, true);
-              xhr.setRequestHeader('Range', 'bytes=' + rangeStart + '-' + rangeEnd);
-              xhr.responseType = 'arraybuffer';
-      
-              xhr.onload = function() {
-                isLoading = false;
-                if (xhr.status >= 200 && xhr.status < 300) {
-                  var data = xhr.response;
-                  console.log("Segment received: " + rangeStart + "-" + rangeEnd);
-                  if (data && data.byteLength > 0) {
-                    appendSegment(data, xhr);
-                  } else {
-                    console.error("Invalid data for range: " + rangeStart + "-" + rangeEnd);
-                    if (retryCount > 0) loadSegment(retryCount - 1);
-                  }
-                } else {
-                  console.error("Failed to fetch segment, status: " + xhr.status);
-                  if (retryCount > 0) setTimeout(function() { loadSegment(retryCount - 1); }, 1000);
-                }
-              };
-              
-      
-              xhr.onerror = function() {
-                isLoading = false;
-                console.error("Error fetching segment:", xhr.statusText);
-                if (retryCount > 0) {
-                  setTimeout(() => loadSegment(retryCount - 1), 2000);
-                }
-              };
-      
-              xhr.send();
+    
+                // Process pending appends when updateend fires.
+                sourceBuffer.addEventListener('updateend', () => {
+                    if (pendingAppends.length > 0 && !sourceBuffer.updating) {
+                        var nextAppend = pendingAppends.shift();
+                        nextAppend();
+                    }
+                });
+    
+                setInterval(() => {
+                    if (sourceBuffer.buffered.length > 0) {
+                        var currentTime = videoElement.currentTime;
+                        var bufferedEnd = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                        var bufferedAhead = bufferedEnd - currentTime;
+                        console.log("Buffer ahead: " + bufferedAhead.toFixed(2));
+                        // reload or fetch next chunk if too little buffered ahead
+                        if (bufferedAhead < minBufferAhead) {
+                            loadSegment(3);
+                        }
+                    }
+                }, 1000);
+                loadSegment(3);     
             }
-      
-            function appendSegment(data, xhr) {
-              // Ensure MediaSource is still open.
-              if (mediaSource.readyState !== "open") {
-                console.warn("MediaSource closed; cannot append segment.");
-                return;
-              }
-              if (sourceBuffer.updating) {
-                pendingAppends.push(() => appendSegment(data, xhr));
-                return;
-              }
-              try {
-                // remove extra old data (secondary check).
-                if (sourceBuffer.buffered.length > 0 && videoElement) {
-                  var bufferedStart = sourceBuffer.buffered.start(0);
-                  var currentTime = videoElement.currentTime;
-                  if (currentTime - bufferedStart > 60) {
-                    var removeEnd = Math.max(currentTime - 30, bufferedStart);
-                    console.log("Removing extra old buffer from " + bufferedStart.toFixed(2) + " to " + removeEnd.toFixed(2));
-                    sourceBuffer.remove(bufferedStart, removeEnd);
-                    // resume appending when updateend fires.
-                    return;
-                  }
-                }
-                sourceBuffer.appendBuffer(data);
-                console.log("Segment appended: " + rangeStart + "-" + rangeEnd);
-                rangeStart = rangeEnd + 1;
-                rangeEnd = rangeStart + chunkSize;
-                var contentRange = xhr.getResponseHeader('Content-Range');
-                if (contentRange) {
-                  totalSize = parseInt(contentRange.split('/')[1], 10);
-                }
-                var bufferedAhead = 0;
-                if (sourceBuffer.buffered.length > 0) {
-                  bufferedAhead = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1) - videoElement.currentTime;
-                }
-                var delay = bufferedAhead > (maxBufferAhead / 2) ? 1000 : 100;
-                setTimeout(loadSegment, delay);
-              } catch (e) {
-                console.error("Error appending segment:", e);
-                setTimeout(loadSegment, 1000);
-              }
-            }
-      
-            // Process pending appends when updateend fires.
-            sourceBuffer.addEventListener('updateend', () => {
-              if (pendingAppends.length > 0 && !sourceBuffer.updating) {
-                var nextAppend = pendingAppends.shift();
-                nextAppend();
-              }
-            });
-      
-            // Video-specific event handling.
-            if (type === 'video' && videoElement) {
-
-            videoElement.addEventListener('seeking', () => {
-                console.log("User seeking detected");
-                isSeeking = true;
-                pendingAppends = [];
-            
-                var seekTime = videoElement.currentTime;
-                var videoDuration = videoElement.duration || 0;
-            
-                if (videoDuration > 0 && totalSize !== Number.MAX_SAFE_INTEGER) {
-                    rangeStart = Math.floor((seekTime / videoDuration) * totalSize);
-                    rangeStart = Math.floor(rangeStart / chunkSize) * chunkSize;
-                    rangeEnd = rangeStart + chunkSize;
-                    console.log("Seeking to time " + seekTime + "s, starting data fetch from byte " + rangeStart);
-                }
-            
-                // clear the buffer around the seek time to avoid conflicts.
-                if (sourceBuffer.buffered.length > 0) {
-                try {
-                    var clearStart = Math.max(0, seekTime - 10);
-                    var clearEnd = Math.min(seekTime + 30, videoDuration);
-                    console.log("Clearing buffer from " + clearStart + " to " + clearEnd + " due to seek.");
-                    sourceBuffer.remove(clearStart, clearEnd);
-            
-                    // Wait for removal to complete before loading new segment.
-                    sourceBuffer.addEventListener('updateend', function onSeekBufferClear() {
-                    console.log("Buffer cleared for seeking.");
-                    sourceBuffer.removeEventListener('updateend', onSeekBufferClear);
-                    isSeeking = false;
-                    loadSegment(); // Start loading from new position.
-                    }, { once: true });
-            
-                } catch (e) {
-                    console.error("Error clearing buffer during seek:", e);
-                    isSeeking = false;
-                    loadSegment(); // Start loading despite error.
-                }
-                } else {
-                isSeeking = false;
-                loadSegment(); // No buffer to clear, start loading immediately.
-                }
-            });
-
-            /*
-                  
-              videoElement.addEventListener('pause', () => {
-                console.log("Playback paused");
-                isPaused = true;
-              });
-      
-              videoElement.addEventListener('play', () => {
-                console.log("Playback resumed");
-                if (isPaused) {
-                  isPaused = false;
-                  loadSegment();
-                }
-              });
-            */
-
-      
-              setInterval(() => {
-                if (sourceBuffer.buffered.length > 0) {
-                  var currentTime = videoElement.currentTime;
-                  var bufferedEnd = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
-                  var bufferedAhead = bufferedEnd - currentTime;
-                  console.log("Buffer status: " + bufferedAhead.toFixed(2) + " sec ahead");
-                  if (bufferedAhead < minBufferAhead && !isPaused && !isSeeking && !isLoading) {
-                    console.log("Buffer running low, triggering load");
-                    loadSegment();
-                  }
-                }
-              }, 1000);
-            }
-            loadSegment();
-          }
+    
+        
           // --- End fetchSegment function ---
       
           function getBestVideoUrl(mediaLinks, supportsVP9) {
@@ -14296,68 +14353,69 @@ console.log("PROXY_URL:", PROXY_URL);
         this.b.pause()
     };
 
- g.play = function () {
-    var a = this.b;
-
-    // Log the current media source and type being used
-    console.log('Attempting to play media:', a.src);
-    console.log('Media type:', a.type);
-
-    // check if there are multiple sources and log each one
-    var sources = a.getElementsByTagName('source');
-    if (sources.length > 0) {
-        console.log('Multiple sources detected, checking each one:');
-        for (var i = 0; i < sources.length; i++) {
-            console.log("Source " + (i + 1) + ": " + sources[i].src + " (Type: " + sources[i].type + ")");
-        }
-    } else {
-        console.log('No additional sources found, using the primary source.');
-    }
-
-    // ensure the media is properly loaded before trying to play it
-    a.load();
-
-    var attemptedCodec = a.getAttribute('type') || "Unknown codec";
-
-    // Play the media and handle success or failure
-    a.play().then(function () {
-        console.log('Media played successfully');
-        console.log('Attempted codec:', attemptedCodec);
-    }).catch(function (error) {
- 
-        console.error('Play failed:', error);
-
-        // If the error is related to unsupported formats, provide a detailed message
-        if (error.name === 'NotSupportedError') {
-            console.error('The media format is not supported. Please try a different format.');
-
-            // cehck if the media type is unsupported and suggest a format change
-            if (a.type && !['video/mp4', 'audio/mp4', 'video/webm', 'audio/webm'].includes(a.type)) {
-                console.error('The current media type is not supported. Consider switching to a supported format (e.g., MP4 or WebM).');
+    g.play = function () {
+        var a = this.b;
+    
+        // Log the current media source and type being used
+        console.log('Attempting to play media:', a.src);
+        console.log('Media type:', a.type);
+    
+        // Check if there are multiple sources and log each one
+        var sources = a.getElementsByTagName('source');
+        if (sources.length > 0) {
+            console.log('Multiple sources detected, checking each one:');
+            for (var i = 0; i < sources.length; i++) {
+                console.log("Source " + (i + 1) + ": " + sources[i].src + " (Type: " + sources[i].type + ")");
             }
-
         } else {
-            console.error('Unexpected error:', error);
+            console.log('No additional sources found, using the primary source.');
         }
-
-        // retry logic for handling failed play attempts (with exponential backoff)
-        var retryCount = 10;
-        function retryPlay() {
-            if (retryCount > 0) {
-                console.log("Retrying play in 2 seconds... Attempts left: " + retryCount);
-                retryCount--;
-                setTimeout(function () {
-                    a.play().catch(retryPlay);  // retry play and catch errors again
-                }, 2000);  // wait 2 seconds before retrying
+    
+        // Ensure the media is properly loaded before trying to play it
+        a.load();
+    
+        var attemptedCodec = a.getAttribute('type') || "Unknown codec";
+    
+        // Play the media and handle success or failure
+        a.play().then(function () {
+            console.log('Media played successfully');
+            console.log('Attempted codec:', attemptedCodec);
+        }).catch(function (error) {
+            console.error('Play failed:', error);
+    
+            // If the error is related to unsupported formats, provide a detailed message
+            if (error.name === 'NotSupportedError') {
+                console.error('The media format is not supported. Please try a different format.');
+    
+                // Check if the media type is unsupported and suggest a format change
+                if (a.type && !['video/mp4', 'audio/mp4', 'video/webm', 'audio/webm'].includes(a.type)) {
+                    console.error('The current media type is not supported. Consider switching to a supported format (e.g., MP4 or WebM).');
+                }
+    
             } else {
-                console.error('Failed to play media after multiple attempts.');
+                console.error('Unexpected error:', error);
             }
-        }
-
-        retryPlay();
-    });
+    
+            // Retry logic for handling failed play attempts (with exponential backoff)
+            var retryCount = 10;
+            function retryPlay() {
+                if (retryCount > 0) {
+                    console.log("Retrying play in 2 seconds... Attempts left: " + retryCount);
+                    retryCount--;
+                    setTimeout(function () {
+                        a.play().then(function () {
+                            console.log('Media played successfully');
+                        }).catch(retryPlay);  // retry play and catch errors again
+                    }, 2000);  // wait 2 seconds before retrying
+                } else {
+                    console.error('Failed to play media after multiple attempts.');
+                }
+            }
+    
+            retryPlay();
+        });
     };
-
+    
     g.Ha = function () {
         return this.b.error ? this.b.error.code : null
     };
@@ -15901,9 +15959,9 @@ console.log("PROXY_URL:", PROXY_URL);
                 var c = this.timing.D;
                 gA(this.timing);
                 this.timing.D - c >= .8 * this.A.D ? (this.J++, b = 5 <= this.J) : this.J = 0
-            } else b = this.timing, b = 5E3 < a - (b.g + 1E3 * b.F.delay);
+            } /* else b = this.timing, b = 5E3 < a - (b.g + 1E3 * b.F.delay);
             b ? (b = this.timing, a = a > b.g && 4E12 > a ? a : A(), c = (a - b.g) / 1E3, 8192 <= b.b ? (b.B += (a - b.C) / 1E3, mA(b.o, b.H, b.B)) : oA(b.o, c), nA(b.o, c, b.b), pA(this), this.F = "net.timeout", dA(this, 7)) : this.C = S(y(this.Om, this),
-                this.A.D)
+                this.A.D) */
         }
     };
 
@@ -17636,28 +17694,27 @@ console.log("PROXY_URL:", PROXY_URL);
         a.B && (IA(a.B), a.B.H = !0);
         a.g && (a.o && a.$.g && T(a.A, 64) && !a.b.Pc && QB(a), zB(a), Em(a.Z), ay(a.g), a.g = null)
     }
-
     function ExtractFormatsForCustomPlayerThingMaBob(adaptiveFormats) {
         if (adaptiveFormats) {
             try {
                 var formatsArray = adaptiveFormats.split(',');
-
+    
                 var result = formatsArray.map(function (format) {
-                    if (format.startsWith('url=')) {
+                    if (format.indexOf('url=') === 0) { // Replace startsWith with indexOf
                         var decodedUrl = decodeURIComponent(format.substring(4));
                         console.log('Unformatted URL: ' + decodedUrl);
-
-                        if (decodedUrl.includes('manifest')) {
+    
+                        if (decodedUrl.indexOf('manifest') !== -1) { // Replace includes with indexOf
                             return null;
                         }
-
+    
                         var resolutionMatch = decodedUrl.match(/&size=([\dx]+)/);
                         var resolution = resolutionMatch ? resolutionMatch[1] : null;
                         var processedUrl = decodedUrl.split(/&itag=/, 2).join('&itag=');
                         console.log('Processed URL: ' + processedUrl);
-
+    
                         var params = getQueryParams(processedUrl); // Custom function to extract query parameters
-
+    
                         return {
                             url: processedUrl,
                             type: params['mime'],
@@ -17667,11 +17724,11 @@ console.log("PROXY_URL:", PROXY_URL);
                     }
                     return null;
                 });
-
+    
                 return result.filter(function (format) {
                     return format !== null;
                 });
-
+    
             } catch (error) {
                 console.error('Error decoding adaptiveFormats: ', error);
             }
@@ -17680,6 +17737,7 @@ console.log("PROXY_URL:", PROXY_URL);
             return null;
         }
     }
+    
 
     // Helper function to mimic URLSearchParams (for older JavaScript versions)
     function getQueryParams(url) {
