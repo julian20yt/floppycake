@@ -203,36 +203,43 @@ class FeedsApiVideos {
         const videos = [];
     
         console.log("items yap", JSON.stringify(responseData));
-        
+    
         const items = responseData?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
-
+    
         if (Array.isArray(items)) {
-            for (const item of items) {
+            const allPromises = items.map(async item => {
                 const video = item?.tileRenderer;
     
                 if (video) {
-     
-                    const publishedText = video.metadata?.tileMetadataRenderer?.lines
+                    const publishedTextPromise = video.metadata?.tileMetadataRenderer?.lines
                         ?.find(line => line.lineRenderer?.items
                             ?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
                         ?.lineRenderer?.items
                         ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
                         ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
     
-                    const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+                    const formattedPublishedTimePromise = FeedsApiVideos.convertRelativeDate(publishedTextPromise);
     
-                    const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
+                    const durationTextPromise = video.header?.tileHeaderRenderer?.thumbnailOverlays
                         ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
                         ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
-                    const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
+                    const formatteddurationTextPromise = FeedsApiVideos.convertTimeToSeconds(durationTextPromise);
     
+
+                    const getProfilePicturePromise = FeedsApiVideos.getProfilePicture(video.onSelectCommand?.watchEndpoint?.videoId);
+    
+                    const [formattedPublishedTime, pfpData, formatteddurationText] = await Promise.all([
+                      formattedPublishedTimePromise,
+                      getProfilePicturePromise,
+                      formatteddurationTextPromise
+                    ]);
+
+                    const pfpUrl = pfpData?.pfpUrl || ""; 
+                    const description = pfpData?.description || "No description available."; 
+        
                     const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
                         || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
                         || "John Doe";
-              
-                    const pfpUrl = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
-                        || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
-                        || "https://yt3.ggpht.com/ytc/AIdro_mrBFeElQkp-3jLyFGRPGjkMkgY2ZC8D7IoaQGp0-U=s48-c-k-c0x00ffffff-no-rj"; // Default pfp
     
                     const videoData = {
                         id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
@@ -244,22 +251,109 @@ class FeedsApiVideos {
                         category: video.category || "Unknown Category",
                         categoryLabel: video.categoryLabel || "Unknown Category Label",
                         seconds: formatteddurationText,
-                        pfp: pfpUrl,
+                        pfp: pfpUrl || "", 
+                        description: description || "",
                         browseId: browseId
                     };
     
                     videos.push(videoData);
                 }
-            }
+            });
+    
+            await Promise.all(allPromises);
         } else {
             console.error("No items found in responseData.");
         }
     
         return videos;
-    }
-    
-    
-    static async generateVideoTemplate(parsedVideoData) {
+      }
+
+      static async getProfilePicture(videoId) {
+          try {
+              const params = "qgMCZGG6AwoI5tiC0qjb9sRrugMKCNPa26_4mbGDJboDCgjYjIz7k73C8X26AwsIsuTT3PDW45rJAboDCgj_neig0riToyG6AwsI4Ifex42A0rbBAboDCwiBv8K9jND2_LkBugMLCJ6Oxdqf5r_QugG6AwsIiLTcqYLIvozQAboDCgi54P_p4OqE13m6AwsIkNCS1LL";
+      
+              if (!params || params.trim() === "") {
+                  throw new Error('"params" must be a non-empty string.');
+              }
+      
+              const response = await axios.post(
+                  "https://www.youtube.com/youtubei/v1/next",
+                  {
+                      context: {
+                          client: {
+                              clientName: 'TVHTML5',
+                              clientVersion: '5.20150715',
+                              screenWidthPoints: 600,
+                              screenHeightPoints: 275,
+                              screenPixelDensity: 2,
+                              theme: 'CLASSIC',
+                              webpSupport: false,
+                              acceptRegion: 'US',
+                              acceptLanguage: 'en-US',
+                          },
+                          user: {
+                              enableSafetyMode: false,
+                          },
+                      },
+                      params: params,
+                      videoId: videoId,
+                  },
+                  {
+                      headers: {
+                          "Content-Type": "application/json",
+                          "Origin": "https://www.youtube.com/",
+                          "Referer": "https://www.youtube.com/tv/",
+                          "User-Agent": "Mozilla/5.0"
+                      }
+                  }
+              );
+      
+              const sections = response.data.contents?.singleColumnWatchNextResults?.results?.results?.contents;
+              if (!sections || sections.length < 2) {
+                  console.error("Failed to find the correct itemSectionRenderer.");
+                  return null;
+              }
+      
+              const secondSection = sections[1]?.itemSectionRenderer?.contents;
+              if (!secondSection) {
+                  console.error("Second itemSectionRenderer is missing.");
+                  return null;
+              }
+
+              const firstSection = sections[0]?.itemSectionRenderer?.contents;
+              if (!secondSection) {
+                  console.error("First itemSectionRenderer is missing.");
+                  return null;
+              }
+      
+              const ownerData = secondSection.find(item => item.videoOwnerRenderer);
+              if (!ownerData || !ownerData.videoOwnerRenderer) {
+                  console.error("Failed to find video owner data.");
+                  return null;
+              }
+      
+              const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop().url;
+
+              const description = (firstSection?.[0]?.videoMetadataRenderer?.description?.runs?.[0]?.text || "")
+              .replace(/\\n/g, "\n")  
+              .replace(/\n/g, " ")    
+              .replace(/['"]/g, '')  
+              .replace(/\(.*?\)/g, '') 
+              .trim() || "No description available.";
+          
+            
+      
+              console.log(`Video ID: ${videoId}`);
+              console.log(`Profile Picture URL: ${pfpUrl}`);
+              console.log(`Description: ${JSON.stringify(description, null, 2)}`);
+      
+              return { pfpUrl, description };
+          } catch (error) {
+              console.error("Error fetching profile picture:", error);
+          }
+      }
+     
+      static async generateVideoTemplate(parsedVideoData) {
       
         if (parsedVideoData == "null" || parsedVideoData == ' ' || parsedVideoData == null ) {
             return "";
@@ -279,6 +373,9 @@ class FeedsApiVideos {
         const pfpURL = parsedVideoData.pfp || `null`;
 
         const username = parsedVideoData.browseId || `null`;
+
+        const description = parsedVideoData.description || `null`;
+
     
         const videoTemplate = `
             {
@@ -415,7 +512,7 @@ class FeedsApiVideos {
                     }
                   ],
                   "media$description": {
-                    "$t": "",
+                    "$t": "${description}",
                     "type": "plain"
                   },
                   "media$keywords": {},

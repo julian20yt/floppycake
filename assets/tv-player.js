@@ -8811,8 +8811,6 @@ console.log("PROXY_URL:", PROXY_URL);
         this.g = this.b = null;
         this.B = b;
     
-
-
         if (!window.MediaSource && !window.WebKitMediaSource) {
             console.error("MediaSource API is not supported. Falling back to separate video and audio elements.");
         
@@ -9305,6 +9303,7 @@ console.log("PROXY_URL:", PROXY_URL);
             }
         }
     };
+
     Nr.prototype.H = function () {
         this.dispose()
     };
@@ -18065,14 +18064,24 @@ console.log("PROXY_URL:", PROXY_URL);
             } catch (error) {
                 console.error("Error in UB function:", error);
 
+                /*
                 error.message = "window.URL object overwritten by external code";
                 window.setTimeout(function () {
                     throw error;
                 }, 0);
+                */
 
-                Lu(a, "html5.missingapi", "YTP_HTML5_NO_AVAILABLE_FORMATS_FALLBACK", "updateMs.1");
+                console.lof(a, "html5.missingapi", "YTP_HTML5_NO_AVAILABLE_FORMATS_FALLBACK", "updateMs.1");
 
-                return null;
+                a.H = new Nr(
+                    a.g.Wa(),
+                    a.b.lengthSeconds,
+                    a.b.g.videoInfos[0].mimeType, //c
+                    a.b.g.b[0].mimeType,
+                    a.M.B,
+                    meidaLinks
+                );
+
             }
         }
     }

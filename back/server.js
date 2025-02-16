@@ -28,6 +28,9 @@ const gdataVideoFeedDefaultUserSubs = require('./gdata_video_feed_default_newsub
 
 const gdataVideoFeedDefaultEvents = require('./gdata_video_feed_default_events');
 
+const gdataVideoFeedDefaultRatings = require('./gdata_video_feed_ratings');
+
+
 
 const { handleGetVideoInfo } = require('./get_video_info');
 
@@ -304,6 +307,8 @@ app.use(gdataVideoFeedUserUploads);
 //for user info (non default)
 app.use(gdataVideoFeedUserInfo);
 
+//for ratings 
+app.use(gdataVideoFeedDefaultRatings);
 
 
 

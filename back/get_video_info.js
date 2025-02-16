@@ -37,7 +37,7 @@ function handleGetVideoInfo(req, res) {
         quiet: true,
     })
         .then(output => {
-            //console.log('Video Info:', output);
+
 
             const logsDir = path.join(__dirname, 'logs');
             if (!fs.existsSync(logsDir)) {
@@ -151,7 +151,7 @@ function handleGetVideoInfo(req, res) {
         of=DI8ulxjA44_i6rKc8TzAhw
         iv_invideo_url=https%3A%2F%2Fwww.youtube.com%2Fannotations_invideo%3Fcap_hist%3D1%26cta%3D2%26playlist_id%3DPLSH1V8Iv8_1VZzhTkvVHYdz8KUPeBGfN9%26video_id%3D0ggR11jYS3A
         length_seconds=${encodeURIComponent(videoDuration)}
-        has_cc=False
+        cc_load_policy=true
         enablecsi=1
         pltype=contentugc
         dashmpd=https%3A%2F%2Fmanifest.googlevideo.com%2Fapi%2Fmanifest%2Fdash%2Frequiressl%2Fyes%2Fsparams%2Fas%252Cid%252Cip%252Cipbits%252Citag%252Cmm%252Cms%252Cmv%252Cpl%252Cplayback_host%252Crequiressl%252Csource%252Cexpire%2Fmm%2F31%2Fexpire%2F1426367447%2Fid%2Fo-ACX1zI2XgFa9Ua6DBBBDhejjcyuqZGGcBBuxoqx7yZEe%2Fipbits%2F0%2Ffexp%2F907263%252C927622%252C931372%252C933236%252C934954%252C937432%252C9405703%252C9406736%252C9407103%252C9407444%252C941440%252C943917%252C948124%252C951511%252C951703%252C952302%252C952612%252C952901%252C955301%252C957201%252C959701%252C963100%2Fupn%2FlzQl8NX90vo%2Fmt%2F1426345559%2Fsignature%2F83B28AA4F045410275E6A998720437E4349EF203.900B9BF39796F93CF795F626B9BD3FDD4B3723BA%2Fmv%2Fu%2Fip%2F207.241.226.230%2Fkey%2Fyt5%2Fitag%2F0%2Fpl%2F23%2Fsver%2F3%2Fplayback_host%2Fr10---sn-nwj7kned.googlevideo.com%2Fas%2Ffmp4_audio_clear%252Cwebm_audio_clear%252Cfmp4_sd_hd_clear%252Cwebm_sd_hd_clear%252Cwebm2_sd_hd_clear%2Fsource%2Fyoutube%2Fms%2Fau

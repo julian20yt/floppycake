@@ -10886,7 +10886,17 @@
             if (a.indexOf("yt3.ggpht.com") !== -1) {
                 return a;  
             }
+
+            if (a == "Y30JRSgfhYXA6i6xX1erWg") {
+                return APP_URL + "/assets/channels4_profile_smosh.jpg";  
+               }
+
+            if (a == "aBf1a-dpIsw8OxqH4ki2Kg") {
+                return APP_URL + "/assets/channels4_profile_geek.jpg";  
+            }
         
+
+
             var e = 0;
             for (var f = 0; f < a.length; ++f) {
                 e = 31 * e + a.charCodeAt(f);

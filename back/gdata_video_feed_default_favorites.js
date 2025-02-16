@@ -204,31 +204,28 @@ class FeedsApiVideos {
 
       static async getProfilePicture(videoId) {
           try {
-            
               const params = "qgMCZGG6AwoI5tiC0qjb9sRrugMKCNPa26_4mbGDJboDCgjYjIz7k73C8X26AwsIsuTT3PDW45rJAboDCgj_neig0riToyG6AwsI4Ifex42A0rbBAboDCwiBv8K9jND2_LkBugMLCJ6Oxdqf5r_QugG6AwsIiLTcqYLIvozQAboDCgi54P_p4OqE13m6AwsIkNCS1LL";
-
+              
               if (!params || params.trim() === "") {
                   throw new Error('"params" must be a non-empty string.');
               }
-
+      
               const response = await axios.post(
                   "https://www.youtube.com/youtubei/v1/next",
                   {
                       context: {
                           client: {
-                            clientName: 'TVHTML5',
-                            clientVersion: '5.20150715',
-                            screenWidthPoints: 600,
-                            screenHeightPoints: 275,
-                            screenPixelDensity: 2,
-                            theme: 'CLASSIC',
-                            webpSupport: false,
-                            acceptRegion: 'US',
-                            acceptLanguage: 'en-US',
-                        },
-                        user: {
-                            enableSafetyMode: false,
-                        },
+                              clientName: 'TVHTML5',
+                              clientVersion: '5.20150715',
+                              screenWidthPoints: 600,
+                              screenHeightPoints: 275,
+                              screenPixelDensity: 2,
+                              theme: 'CLASSIC',
+                              webpSupport: false,
+                              acceptRegion: 'US',
+                              acceptLanguage: 'en-US',
+                          },
+                          user: { enableSafetyMode: false },
                       },
                       params: params,
                       videoId: videoId,
@@ -242,33 +239,62 @@ class FeedsApiVideos {
                       }
                   }
               );
-
-              const sections = response.data.contents?.singleColumnWatchNextResults?.results?.results?.contents;
+      
+              const sections = response?.data?.contents?.singleColumnWatchNextResults?.results?.results?.contents;
               if (!sections || sections.length < 2) {
-                  console.error("Failed to find the correct itemSectionRenderer.");
-                  return null;
+                  console.warn(`Failed to find itemSectionRenderer for videoId ${videoId}.`);
+                  return { 
+                      pfpUrl: "https://yt3.ggpht.com/default_pfp.png",
+                      description: "No description available."
+                  };
               }
-
+      
               const secondSection = sections[1]?.itemSectionRenderer?.contents;
               if (!secondSection) {
-                  console.error("Second itemSectionRenderer is missing.");
-                  return null;
+                  console.warn(`Second itemSectionRenderer missing for videoId ${videoId}.`);
+                  return { 
+                      pfpUrl: "https://yt3.ggpht.com/default_pfp.png",
+                      description: "No description available."
+                  };
               }
-
+      
+              const firstSection = sections[0]?.itemSectionRenderer?.contents;
+              if (!firstSection) {
+                  console.warn(`First itemSectionRenderer missing for videoId ${videoId}.`);
+                  return { 
+                      pfpUrl: "https://yt3.ggpht.com/default_pfp.png",
+                      description: "No description available."
+                  };
+              }
+      
               const ownerData = secondSection.find(item => item.videoOwnerRenderer);
               if (!ownerData || !ownerData.videoOwnerRenderer) {
-                  console.error("Failed to find video owner data.");
-                  return null;
+                  console.warn(`Failed to find video owner data for videoId ${videoId}.`);
+                  return { 
+                      pfpUrl: "https://yt3.ggpht.com/default_pfp.png",
+                      description: "No description available."
+                  };
               }
-
-              const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop().url; 
-
-              console.log(`Video ID: ${videoId}`);
-              console.log(`Profile Picture URL: ${pfpUrl}`);
-
-              return pfpUrl;
+      
+              const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop()?.url ?? "https://yt3.ggpht.com/default_pfp.png";
+      
+              const description = firstSection?.[0]?.videoMetadataRenderer?.description?.runs?.[0]?.text
+                  ?.replace(/\\n/g, " ") 
+                  ?.replace(/\n/g, " ") 
+                  ?.replace(/['"]/g, '') 
+                  ?.replace(/\(.*?\)/g, '')
+                  ?.trim() || "No description available.";
+      
+              console.log(`Video ID: ${videoId}, Profile Picture: ${pfpUrl}, Description: ${description}`);
+      
+              return { pfpUrl, description };
+      
           } catch (error) {
-              console.error("Error fetching profile picture:", error);
+              console.error(`Error fetching profile picture for Video ID: ${videoId}`, error);
+              return { 
+                  pfpUrl: "https://yt3.ggpht.com/default_pfp.png",
+                  description: "No description available."
+              };
           }
       }
 
@@ -304,7 +330,10 @@ class FeedsApiVideos {
       
                   const videoId = video.onSelectCommand?.watchEndpoint?.videoId || null;
       
-                  const pfpUrl = videoId ? FeedsApiVideos.getProfilePicture(videoId) : "https://yt3.ggpht.com/default_pfp.png";
+                  const profileData = await this.getProfilePicture(videoId) || {};
+                  const pfpUrl = profileData.pfpUrl || "https://yt3.ggpht.com/default_pfp.png";
+                  const description = profileData.description || "No description available.";
+                  
       
                   return { 
                       id: videoId || "Unknown Video ID",
@@ -316,7 +345,8 @@ class FeedsApiVideos {
                       category: video.category || "Unknown Category",
                       categoryLabel: video.categoryLabel || "Unknown Category Label",
                       seconds: formattedDurationText,
-                      pfp: pfpUrl
+                      pfp: pfpUrl,
+                      description: description
                   };
               });
       
@@ -348,6 +378,7 @@ class FeedsApiVideos {
 
         const pfpURL = parsedVideoData.pfp || `null`;
 
+        const description = parsedVideoData.description || `null`;
     
         const videoTemplate = `
             {
@@ -484,7 +515,7 @@ class FeedsApiVideos {
                     }
                   ],
                   "media$description": {
-                    "$t": "",
+                    "$t": "${description}",
                     "type": "plain"
                   },
                   "media$keywords": {},

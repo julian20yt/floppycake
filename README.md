@@ -24,9 +24,9 @@ A project to revive the old 2012-2014 YouTubeTV HTML5 Web App.
 
 - cors-anywhere [https://github.com/Rob--W/cors-anywhere?tab=readme-ov-file]
 
-- youtubei [https://github.com/LuanRT/YouTube.js]
-
 - qr-code [https://www.npmjs.com/package/qrcode]
+
+- xml2js [https://github.com/Leonidas-from-XIV/node-xml2js]
 
 - dx for his knowlage 
 
@@ -47,9 +47,66 @@ PLEASE disable Oauth, so just delete refrences to it in server.js, why
 because this is designed for someone to host themeselves and only themeselves
 so I save your token/refresh token in a .json file.
 
-## Cool Things To Know
+## Things To Know
 
-[WIP]
+If you wanna add/change channels check in leanback_ajax. You'll need to also
+change "function ug(a, b, c) {" for the thumbnail to load.
+
+Make sure it is UU + (your channel id), it HATES it if it is not.
+
+```
+{
+    "gdata_url": "http://gdata.youtube.com/feeds/api/users/Y30JRSgfhYXA6i6xX1erWg/uploads",
+    "title": "Smosh",
+    "tab": "featured",
+    "gdata_list_id": "UUY30JRSgfhYXA6i6xX1erWg", /* take this in mind sadly because of youtube chnaged you'll need to
+        use this in an if statmment if(a == "yourid") and return the thumbnail image. Check in       function ug(a, b, c) {,
+        yeah youtube doesn't let you get it anymore easily*/ 
+    "thumbnail": "http://i1.ytimg.com/vi/1b1loWJfxaA/hqdefault.jpg"
+},
+{
+    "gdata_url": "http://gdata.youtube.com/feeds/api/users/aBf1a-dpIsw8OxqH4ki2Kg/uploads",
+    "title": "Geek & Sundry",
+    "tab": "featured",/* take this in mind sadly because of youtube chnaged you'll need to
+    use this in an if statmment if(a == "yourid") and return the thumbnail image. Check in       function ug(a, b, c) {,
+    yeah youtube doesn't let you get it anymore easily*/ 
+    "gdata_list_id": "UUaBf1a-dpIsw8OxqH4ki2Kg"
+},
+```
+
+
+So To Fix The Thumbnail just add or replace an if statment, the if statment checks for gdata_list_id,
+so just return your profile url like return "url".
+
+You have to do this because YouTube changed how profiles pictures are handled you cannot just create a URL easily
+like with thumbnails, I have no idea why they did that but oh well.
+
+
+(this ignores the UU from each id so make sure to remove it from the if)
+
+```
+function ug(a, b, c) {
+    if (a.indexOf("yt3.ggpht.com") !== -1) {
+        return a;  
+    }
+
+    if (a == "aBf1a-dpIsw8OxqH4ki2Kg") {
+        return APP_URL + "/assets/channels4_profile_smosh.jpg";  
+    }
+
+    if (a == "aBf1a-dpIsw8OxqH4ki2Kg") {
+     return APP_URL + "/assets/channels4_profile_geek.jpg";  
+    }
+
+    var e = 0;
+    for (var f = 0; f < a.length; ++f) {
+        e = 31 * e + a.charCodeAt(f);
+        e %= 4294967296;
+    }
+
+    return "//i" + (e % 4 + 1) + ".ytimg.com/" + b + "/" + a + "/" + c + ".jpg";
+}
+```
 
 ## Why We Use "youtube-dl-exec"
 
@@ -60,11 +117,9 @@ to deal with no  ** you will now need python3.7 or higher installed! though **
 
 Just to make qr codes for the google chart api implementation.
 
-## Why We Use "youtubei"
+## Why We Use "node-xml2js"
 
-It is to make my life easier, 2016YouTube doesn't use it as it formats the JSON from the InnerTube API direct
-as in some cases it is pretty close to the data it wants, but this uses GDATA for a lot of parts and it's just 
-eaiser to prase this way. 
+For XML stuff, it is only in the ratings API though.
 
 ## Why We Use "cors-anywhere"
 

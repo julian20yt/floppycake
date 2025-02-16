@@ -116,13 +116,17 @@ router.get('/leanback_ajax', (req, res) => {
                     "gdata_url": "http://gdata.youtube.com/feeds/api/users/Y30JRSgfhYXA6i6xX1erWg/uploads",
                     "title": "Smosh",
                     "tab": "featured",
-                    "gdata_list_id": "UUY30JRSgfhYXA6i6xX1erWg",
+                    "gdata_list_id": "UUY30JRSgfhYXA6i6xX1erWg", /* take this in mind sadly because of youtube chnaged you'll need to
+                     use this in an if statmment if(a == "yourid") and return the thumbnail image. Check in       function ug(a, b, c) {,
+                     yeah youtube doesn't let you get it anymore easily*/ 
                     "thumbnail": "http://i1.ytimg.com/vi/1b1loWJfxaA/hqdefault.jpg"
                 },
                 {
                     "gdata_url": "http://gdata.youtube.com/feeds/api/users/aBf1a-dpIsw8OxqH4ki2Kg/uploads",
                     "title": "Geek & Sundry",
-                    "tab": "featured",
+                    "tab": "featured",/* take this in mind sadly because of youtube chnaged you'll need to
+                    use this in an if statmment if(a == "yourid") and return the thumbnail image. Check in       function ug(a, b, c) {,
+                    yeah youtube doesn't let you get it anymore easily*/ 
                     "gdata_list_id": "UUaBf1a-dpIsw8OxqH4ki2Kg"
                 },
                 {
@@ -132,7 +136,7 @@ router.get('/leanback_ajax', (req, res) => {
                     "icon": "popular",
                     "gdata_url": "http://gdata.youtube.com/feeds/api/standardfeeds/US/most_popular?time=today",
                     "list_id": "LBpop,0,t,en_US",
-                    "tab": "featured",
+                    "tab": "featured", 
                     "thumbnail": "http://i1.ytimg.com/vi/1b1loWJfxaA/hqdefault.jpg"
                 }
             ]
