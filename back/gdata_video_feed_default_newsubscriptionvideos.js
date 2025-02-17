@@ -279,11 +279,15 @@ class FeedsApiVideos {
             const pfpUrl = ownerData.videoOwnerRenderer.thumbnail.thumbnails.pop()?.url ?? "https://yt3.ggpht.com/default_pfp.png";
 
             const description = firstSection?.[0]?.videoMetadataRenderer?.description?.runs?.[0]?.text
-                ?.replace(/\\n/g, " ") 
-                ?.replace(/\n/g, " ") 
-                ?.replace(/['"]/g, '') 
-                ?.replace(/\(.*?\)/g, '')
-                ?.trim() || "No description available.";
+            
+            ?.replace(/\\n/g, " ")  
+            ?.replace(/\n/g, " ")    
+            ?.replace(/['"]/g, '')   
+            ?.replace(/\(.*?\)/g, '') 
+            ?.replace(/\s{2,}/g, ' ') 
+            ?.replace(/[^a-zA-Z0-9\s,.-]/g, '') 
+            ?.trim() || "No description available.";
+        
 
             console.log(`Video ID: ${videoId}, Profile Picture: ${pfpUrl}, Description: ${description}`);
 
