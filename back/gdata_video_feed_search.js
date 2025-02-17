@@ -217,14 +217,17 @@ class FeedsApiVideos {
             const pfpUrl = ownerData.videoOwnerRenderer.thumbnail?.thumbnails?.pop()?.url || "https://yt3.ggpht.com/default_pfp.png";
             const browseId = ownerData.videoOwnerRenderer.navigationEndpoint?.browseEndpoint?.browseId || "null";
     
-            const descriptionText = firstSection?.[0]?.videoMetadataRenderer?.description?.runs?.[0]?.text || "";
-            const description = descriptionText
-                .replace(/\\n/g, "\n")
-                .replace(/\n/g, " ")
-                .replace(/['"]/g, '')
-                .replace(/\(.*?\)/g, '')
-                .trim() || "No description available.";
-    
+         
+            const description = firstSection?.[0]?.videoMetadataRenderer?.description?.runs?.[0]?.text
+            ?.replace(/\\n/g, " ")  
+            ?.replace(/\n/g, " ")    
+            ?.replace(/['"]/g, '')   
+            ?.replace(/\(.*?\)/g, '') 
+            ?.replace(/\s{2,}/g, ' ') 
+            ?.replace(/[^a-zA-Z0-9\s,.-]/g, '') 
+            ?.trim() || "No description available.";
+        
+
             console.log(`Video ID: ${videoId}`);
             console.log(`Profile Picture URL: ${pfpUrl}`);
             console.log(`Description: ${JSON.stringify(description, null, 2)}`);
@@ -236,69 +239,82 @@ class FeedsApiVideos {
     }
     
     static async convertToIntermediateForm(responseData) {
-        const videos = [];
-    
-        const items = responseData?.contents?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
-    
-        if (!Array.isArray(items)) {
-            console.error("No items found in responseData.");
-            return [];
-        }
-    
-        // Process all video items concurrently using Promise.all
-        const videoPromises = items.map(async (item) => {
-            const video = item.tileRenderer;
-            if (!video) return null;
-    
-            try {
-                const publishedText = video.metadata?.tileMetadataRenderer?.lines
-                    ?.find(line => line.lineRenderer?.items?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
-                    ?.lineRenderer?.items
-                    ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
-                    ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
-    
-                const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
-    
-                const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
-                    ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
-                    ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
-    
-                const formatteddurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
-    
-                const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "John Doe";
-    
-                const profileData = await this.getProfilePicture(video.onSelectCommand?.watchEndpoint?.videoId) || {};
-                const browseId = profileData.browseId || "null";
-    
-                const videoData = {
-                    id: video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID",
-                    author: authorText,
-                    title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
-                    etag: video.etag || "null",
-                    published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
-                    updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
-                    category: video.category || "Unknown Category",
-                    categoryLabel: video.categoryLabel || "Unknown Category Label",
-                    seconds: formatteddurationText,
-                    pfp: profileData.pfpUrl || "https://yt3.ggpht.com/default_pfp.png",
-                    description: profileData.description || "No description available.",
-                    browseId: browseId
-                };
-    
-                return videoData;
-            } catch (error) {
-                console.error(`Error processing video ${video.onSelectCommand?.watchEndpoint?.videoId}:`, error);
-                return null;
-            }
-        });
-    
-        // Wait for all video processing to finish
-        const results = await Promise.all(videoPromises);
-    
-        // Filter out any null results (failed processing)
-        return results.filter(video => video !== null);
-    }
+      const videos = [];
   
+      const items = responseData?.contents?.sectionListRenderer?.contents?.[0]?.shelfRenderer?.content?.horizontalListRenderer?.items;
+  
+      if (!Array.isArray(items)) {
+          console.error("No items found in responseData.");
+          return [];
+      }
+  
+      // Create a Map to cache profile data requests and avoid repeated fetches
+      const profileCache = new Map();
+  
+      const videoPromises = items.map((item) => {
+          const video = item.tileRenderer;
+          if (!video) return Promise.resolve(null);
+  
+          return this.processVideo(video, profileCache);
+      });
+  
+      // Wait for all video processing to finish
+      const results = await Promise.all(videoPromises);
+  
+      // Filter out any null results (failed processing)
+      return results.filter(video => video !== null);
+  }
+  
+  // Helper method to process each video
+    static async processVideo(video, profileCache) {
+      try {
+          const publishedText = video.metadata?.tileMetadataRenderer?.lines
+              ?.find(line => line.lineRenderer?.items?.some(item => item.lineItemRenderer?.text?.simpleText?.includes("ago")))
+              ?.lineRenderer?.items
+              ?.find(item => item.lineItemRenderer?.text?.simpleText?.includes("ago"))
+              ?.lineItemRenderer?.text?.simpleText || "Unknown Published Time";
+  
+          const formattedPublishedTime = await FeedsApiVideos.convertRelativeDate(publishedText);
+  
+          const durationText = video.header?.tileHeaderRenderer?.thumbnailOverlays
+              ?.find(overlay => overlay.thumbnailOverlayTimeStatusRenderer)
+              ?.thumbnailOverlayTimeStatusRenderer?.text?.simpleText || "0";
+          const formattedDurationText = await FeedsApiVideos.convertTimeToSeconds(durationText);
+  
+          const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "John Doe";
+  
+          // Cache profile data for reuse
+          const videoId = video.onSelectCommand?.watchEndpoint?.videoId || "Unknown Video ID";
+          let profileData = profileCache.get(videoId);
+          if (!profileData) {
+              profileData = await this.getProfilePicture(videoId) || {};
+              profileCache.set(videoId, profileData);
+          }
+  
+          const browseId = profileData.browseId || "null";
+  
+          const videoData = {
+              id: videoId,
+              author: authorText,
+              title: video.metadata?.tileMetadataRenderer?.title?.simpleText || "Unknown Title",
+              etag: video.etag || "null",
+              published: formattedPublishedTime || "2013-05-10T00:00:01.000Z",
+              updated: video.updatedTimeText?.simpleText || "Unknown Updated Time",
+              category: video.category || "Unknown Category",
+              categoryLabel: video.categoryLabel || "Unknown Category Label",
+              seconds: formattedDurationText,
+              pfp: profileData.pfpUrl || "https://yt3.ggpht.com/default_pfp.png",
+              description: profileData.description || "No description available.",
+              browseId: browseId
+          };
+  
+          return videoData;
+  
+      } catch (error) {
+          console.error(`Error processing video ${video.onSelectCommand?.watchEndpoint?.videoId}:`, error);
+          return null;
+      }
+  }  
     
     static async generateVideoTemplate(parsedVideoData) {
 

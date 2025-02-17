@@ -9113,19 +9113,26 @@
             this.uj.remove(a);
             this.$y.AA()
         };
+        
         Re.$inject = ["environmentModel"];
-
+        
         function Se(a) {
             this.Yz = a;
-            this.Ji = this.Yz.get("captions-settings") || {}
+            this.Ji = this.Yz.get("captions-settings") || {};
         }
+        
         Se.prototype.yO = function() {
-            return this.Ji && this.Ji.Tz ? this.Ji.Tz : 3
+            var value = this.Ji && this.Ji.Tz ? this.Ji.Tz : 2;
+            console.log("yO method called, returning value: " + value);
+            return value;
         };
+        
         Se.prototype.xy = function(a) {
             this.Ji.Tz = a;
-            this.Yz.sb("captions-settings", this.Ji)
+            this.Yz.sb("captions-settings", this.Ji);
+            console.log("xy method called, setting Tz to: " + a);
         };
+        
         Se.$inject = ["localStorage"];
 
         function Te(a, b, c) {
@@ -12657,7 +12664,7 @@
             this.jj = this.mj.tC(this.uC, 800, this);
             this.oj = -1;
             this.subtitlesModuleGeneration =
-                0;
+                1;
             this.subtitlesTrack = null;
             this.tj = -1;
             this.rj = !1;
@@ -12777,8 +12784,8 @@
                 enablejsapi: 1,
                 ps: "leanback",
                 jsapicallback: w(this.HG, this),
-                iv_load_policy: 3,
-                cc_load_policy: 3,
+                iv_load_policy: 1,
+                cc_load_policy: 0,
                 video_container_override: this.GG(),
                 hl: this.Vs.ld,
                 svt: this.Mb.requiresSingleVideoTag,
@@ -17152,7 +17159,7 @@
         function Bj(a) {
             V.call(this, "ramp");
             this.Ea = a;
-            this.ll = 0;
+            this.ll = 1;
             this.Jd = null;
             this.Uy = new Y("YouTube", ["ramp"]);
             this.$p(this.Uy.Qy("ramp"));
@@ -20698,7 +20705,7 @@
             return []
         };
         kl.$inject = "$scope $element $attrs environmentModel locale searchQueryModel transliterationModel".split(" ");
-
+      
         function ll(a, b, c, e) {
             this.name = "closedCaptions";
             Q.call(this, a, b, c);
@@ -20706,7 +20713,7 @@
             this.options = [];
             this.yu = this.h("#captions-not-available");
             this.xu = this.h("#captions-loading");
-            this.X = new We;
+            this.X = new We();
             this.rowCount = 6;
             this.scope.$on("button-click", w(this.mG, this));
             this.scope.$watch(w(function() {
@@ -20714,8 +20721,23 @@
             }, this), w(function(a, b) {
                 a !== b && this.lG()
             }, this));
-            this.Oc.Gu() && this.Oc.kG(0.5) ? this.u(this.yu, !1) : (this.u(this.xu, !1), this.isActive = !0)
+        
+            this.Oc.Gu() && this.Oc.kG(0.5) ? this.u(this.yu, !1) : (this.u(this.xu, !1), this.isActive = !0);
+        
+            // Log the instance properties
+            console.log("ll instance:", {
+                name: this.name,
+                Oc: this.Oc,
+                options: this.options,
+                yu: this.yu,
+                xu: this.xu,
+                X: this.X,
+                rowCount: this.rowCount,
+                isActive: this.isActive,
+                scope: this.scope
+            });
         }
+        
         z(ll, Q);
         d = ll.prototype;
         d.hI = function() {
