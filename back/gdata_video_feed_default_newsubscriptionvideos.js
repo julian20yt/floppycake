@@ -361,7 +361,8 @@ class FeedsApiVideos {
                     category: video.category || "Unknown Category",
                     categoryLabel: video.categoryLabel || "Unknown Category Label",
                     seconds: seconds,
-                    pfp: pfpUrl
+                    pfp: pfpUrl,
+                    description: description
                 };
             }
     
@@ -382,6 +383,7 @@ class FeedsApiVideos {
         const id = parsedVideoData.id || `ufsrgE0BYf0`;
 
         const title = parsedVideoData.title || "Gravity - Official Teaser Trailer [HD]";
+
         const escapedTitle = title.replace(/"/g, '\\"');
 
         const published = parsedVideoData.published || `2013-05-10T00:00:01.000Z`;
@@ -392,6 +394,7 @@ class FeedsApiVideos {
 
         const pfpURL = parsedVideoData.pfp || `null`;
 
+        const description = parsedVideoData.description || `null`;
     
         const videoTemplate = `
             {
@@ -528,7 +531,7 @@ class FeedsApiVideos {
                     }
                   ],
                   "media$description": {
-                    "$t": "",
+                    "$t": "${description}",
                     "type": "plain"
                   },
                   "media$keywords": {},
