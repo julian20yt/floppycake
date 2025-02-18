@@ -321,11 +321,14 @@ class FeedsApiVideos {
                   let description = pfpData?.description || "No description available."; 
                  
                   description = (description || "")
-                  .replace(/\\n/g, "\n")  
-                  .replace(/\n/g, " ")     
-                  .replace(/['"]/g, '')    
-                  .replace(/\(.*?\)/g, '') 
-                  .trim() || "No description available.";
+                    ?.replace(/\\n/g, " ")  
+                    ?.replace(/\n/g, " ")    
+                    ?.replace(/['"]/g, '')   
+                    ?.replace(/\(.*?\)/g, '') 
+                    ?.replace(/\s{2,}/g, ' ') 
+                    ?.replace(/[^a-zA-Z0-9\s,.-]/g, '') 
+                    ?.trim() || "No description available.";
+                
 
                   const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.simpleText
                       || video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text
@@ -394,8 +397,17 @@ class FeedsApiVideos {
                   ]);
       
                   const pfpUrl = pfpData?.pfpUrl || ""; 
-                  const description = pfpData?.description || "No description available."; 
-      
+                  let description = pfpData?.description || "No description available."; 
+
+                  description = (description || "")
+                  ?.replace(/\\n/g, " ")  
+                  ?.replace(/\n/g, " ")    
+                  ?.replace(/['"]/g, '')   
+                  ?.replace(/\(.*?\)/g, '') 
+                  ?.replace(/\s{2,}/g, ' ') 
+                  ?.replace(/[^a-zA-Z0-9\s,.-]/g, '') 
+                  ?.trim() || "No description available.";
+
                   const authorText = video.metadata?.tileMetadataRenderer?.lines?.[0]?.lineRenderer?.items?.[0]?.lineItemRenderer?.text?.runs?.[0]?.text || "Unknown Author";
       
                   const videoData = {
