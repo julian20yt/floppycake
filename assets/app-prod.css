@@ -1,18 +1,18 @@
 @font-face {
   font-family: 'roboto-condensed-regular';
-  src: url('/RobotoCondensed-Regular.ttf') format('truetype')
+  src: url('./RobotoCondensed-Regular.ttf') format('truetype')
 }
 
 @font-face {
   font-family: 'roboto-light';
-  src: url('/Roboto-Light.ttf') format('truetype')
+  src: url('./Roboto-Light.ttf') format('truetype')
 }
 
 @font-face {
   font-family: 'youtube-icons';
   font-style: normal;
   font-weight: normal;
-  src: url('/youtube-icons.ttf') format('truetype')
+  src: url('./youtube-icons.ttf') format('truetype')
 }
   
 
@@ -67,7 +67,7 @@ ul {
 
 .logo-container {
   background-size: 100%;
-  background: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/logo.png) no-repeat;
+  background: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/logo.png) no-repeat;
   float: right;
   height: 41px;
   position: absolute;
@@ -121,7 +121,7 @@ ul {
 }
 
 .carousel-loading-indicator {
-  background: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/carousel-loading-indicator.gif);
+  background: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/carousel-loading-indicator.gif);
   background-size: 100%;
   border-radius: 1em;
   height: 11.5em;
@@ -877,7 +877,7 @@ ul {
 .video-tile .video-thumb.preloaded {
   background: no-repeat center;
   background-size: auto;
-  background-image: url('/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-playbutton.png')
+  background-image: url('https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-playbutton.png')
 }
 
 .action-tile .content {
@@ -950,7 +950,7 @@ ul {
 }
 
 .action-tile .icon.enabled {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-settings-checked.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-settings-checked.png)
 }
 
 .action-tile .icon.disabled {
@@ -966,7 +966,7 @@ ul {
 }
 
 .action-tile .sign-in-user-icon {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-default-avatar.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-default-avatar.png)
 }
 
 .action-tile .sign-out-username {
@@ -994,14 +994,14 @@ ul {
 }
 
 .action-tile .remote-pair-icon {
-  background: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone-icons.png) no-repeat center;
+  background: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone-icons.png) no-repeat center;
   background-size: contain;
   height: 11em;
   margin-top: 3.5em
 }
 
 .action-tile .remote-reset-phone {
-  background: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone-portrait.png) no-repeat center;
+  background: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone-portrait.png) no-repeat center;
   background-size: contain;
   height: 14em;
   margin-top: .6em;
@@ -1046,11 +1046,11 @@ ul {
 }
 
 .action-tile .search-icon {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-search-tile.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-search-tile.png)
 }
 
 .action-tile .clear-search-icon {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-search-tile-clear.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-search-tile-clear.png)
 }
 
 .action-tile .search-tile-subtitle {
@@ -1060,7 +1060,7 @@ ul {
 }
 
 .action-tile .warning {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-warning.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-warning.png)
 }
 
 #dialog.remote-reset-dialog>.title {
@@ -1187,14 +1187,14 @@ ul {
   background-size: 1em;
   background-position: left center;
   background-repeat: no-repeat;
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone_icon.png);
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone_icon.png);
   overflow: hidden;
   text-overflow: ellipsis;
   width: 11.5em
 }
 
 .remote-reset-dialog ul.devices li.connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone_icon_connected.png);
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/phone_icon_connected.png);
   color: #f1f1f1
 }
 
@@ -1266,7 +1266,7 @@ ul {
 
 #search-text-box {
   background-color: #f1f1f1;
-  background: transparent url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/bg-search-input.png) repeat-x;
+  background: transparent url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/bg-search-input.png) repeat-x;
   font-size: 1.7em;
   height: 1.5em;
   line-height: 1.5em;
@@ -1310,7 +1310,7 @@ ul {
 }
 
 #search-suggestion .suggestion-trigger {
-  background: transparent url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/suggestion_trigger_hover.png) no-repeat;
+  background: transparent url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/suggestion_trigger_hover.png) no-repeat;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
@@ -1324,7 +1324,7 @@ ul {
 
 #search-suggestion.active .suggestion-trigger,
 #search-suggestion .suggestion-trigger:hover {
-  background: transparent url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/suggestion_trigger.png) no-repeat;
+  background: transparent url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/suggestion_trigger.png) no-repeat;
   background-size: contain
 }
 
@@ -1400,14 +1400,14 @@ ul {
   background-size: 80%;
   background-position: center center;
   background-repeat: no-repeat;
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-globe.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-globe.png)
 }
 
 #search-keyboard .delete-icon {
   background-size: 80%;
   background-position: center center;
   background-repeat: no-repeat;
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-delete.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-delete.png)
 }
 
 .letter-suggest {
@@ -1612,7 +1612,7 @@ ul {
 
 .advertisement-callout {
   background-size: cover;
-  background: transparent url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/advertisement-bg.png) 0 0 repeat;
+  background: transparent url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/advertisement-bg.png) 0 0 repeat;
   color: #cfc323;
   font-size: 1.1em;
   padding: 0.7em
@@ -1792,7 +1792,7 @@ ul {
 }
 
 #progress-bar>div {
-  background: transparent url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/player-controls.png) no-repeat
+  background: transparent url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/player-controls.png) no-repeat
 }
 
 #progress-bar .player-seek-active {
@@ -2067,51 +2067,51 @@ ul {
 }
 
 #toast .remote-connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/remote_connect.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/remote_connect.png)
 }
 
 #toast .remote-disconnected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/remote_disconnect.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/remote_disconnect.png)
 }
 
 #toast .android-phone-connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-phone-connected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-phone-connected.png)
 }
 
 #toast .android-phone-disconnected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-phone-disconnected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-phone-disconnected.png)
 }
 
 #toast .android-tablet-connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-tablet-connected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-tablet-connected.png)
 }
 
 #toast .android-tablet-disconnected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-tablet-disconnected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-android-tablet-disconnected.png)
 }
 
 #toast .ios-phone-connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-phone-connected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-phone-connected.png)
 }
 
 #toast .ios-phone-disconnected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-phone-disconnected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-phone-disconnected.png)
 }
 
 #toast .ios-tablet-connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-tablet-connected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-tablet-connected.png)
 }
 
 #toast .ios-tablet-disconnected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-tablet-disconnected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-ios-tablet-disconnected.png)
 }
 
 #toast .laptop-connected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-laptop-connected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-laptop-connected.png)
 }
 
 #toast .laptop-disconnected {
-  background-image: url(/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-laptop-disconnected.png)
+  background-image: url(https://web.archive.org/web/20130711074930im_/https://www.youtube.com/s/tv/html5/7b193301/img/icon-laptop-disconnected.png)
 }
 
 #toast .toast-progress {
