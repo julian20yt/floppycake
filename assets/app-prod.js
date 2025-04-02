@@ -853,7 +853,7 @@
                 A = a.find("base");
             f.url = function(a, b) {
                 if (a) {
-                    if (M != a) return M = a, d.history ? b ? k.replaceState(null,  a) : (k.pushState(null,  a), A.attr("href", A.attr("href"))) : b ? i.replace(a) : i.href = a, f
+                    if (M != a) return M = a, d.history ? b ? k.replaceState(null, "", a) : (k.pushState(null, "", a), A.attr("href", A.attr("href"))) : b ? i.replace(a) : i.href = a, f
                 } else return i.href.replace(/%27/g, "'")
             };
             var N = [],
@@ -868,7 +868,8 @@
                 return a ? a.replace(/^https?\:\/\/[^\/]*/,
                     "") : ""
             };
-            var r = {}, 
+            var r = {},
+                $ = "",
                 R = f.baseHref();
             f.cookies = function(a, b) {
                 var d, e, f, i;
@@ -1520,8 +1521,8 @@
             var d = va(b);
             if (decodeURIComponent(d.path) == a && !w(d.hash) && d.hash.indexOf(c) === 0) return b;
             else {
-                var e = d.search && "?" + d.search || 
-                    g = d.hash && "#" + d.hash || 
+                var e = d.search && "?" + d.search || "",
+                    g = d.hash && "#" + d.hash || "",
                     h = a.substr(0, a.lastIndexOf("/")),
                     f = d.path.substr(h.length);
                 if (d.path.indexOf(h) !== 0) throw Error('Invalid url "' + b + '", missing path prefix "' + h + '" !');
@@ -1601,7 +1602,7 @@
         }
 
         function Jc() {
-            var b = 
+            var b = "",
                 a = !1;
             this.hashPrefix = function(a) {
                 return y(a) ? (b = a, this) : b
@@ -1710,7 +1711,7 @@
             }
 
             function i() {
-                for (var a =  c = p; p < b.length;) {
+                for (var a = "", c = p; p < b.length;) {
                     var i = z(b.charAt(p));
                     if (i == "." ||
                         e(i)) a += i;
@@ -1735,7 +1736,7 @@
             }
 
             function k() {
-                for (var c =  d = p, f, i, j, k; p < b.length;) {
+                for (var c = "", d = p, f, i, j, k; p < b.length;) {
                     k = b.charAt(p);
                     if (k == "." || h(k) || e(k)) k == "." && (f = p), c += k;
                     else break;
@@ -1783,7 +1784,7 @@
             function l(a) {
                 var c = p;
                 p++;
-                for (var d =  e = a, f = !1; p < b.length;) {
+                for (var d = "", e = a, f = !1; p < b.length;) {
                     var i = b.charAt(p);
                     e += i;
                     if (f) i == "u" ? (i = b.substring(p + 1, p + 5), i.match(/[\da-f]{4}/i) || j("Invalid unicode escape [\\u" + i + "]"), p += 4, d += String.fromCharCode(parseInt(i, 16))) : (f = Mc[i], d += f ? f : i), f = !1;
@@ -2312,7 +2313,7 @@
             };
             this.$get = ["$rootScope", "$location", "$routeParams", "$q", "$injector", "$http", "$templateCache", function(a, c, d, e, g, h, f) {
                 function j(a, b) {
-                    for (var b = "^" + b.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&") + "$", c =  d = [], e = {}, f = /:(\w+)/g, i, g = 0;
+                    for (var b = "^" + b.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&") + "$", c = "", d = [], e = {}, f = /:(\w+)/g, i, g = 0;
                         (i = f.exec(b)) !== null;) c += b.slice(g, i.index), c += "([^\\/]*)", d.push(i[1]), g = f.lastIndex;
                     c += b.substr(g);
                     var h = a.match(RegExp(c));
@@ -2828,7 +2829,7 @@
             }
             return function(e, j, i, k, l, n, o) {
                 function p(a, c, d, e) {
-                    c = (j.match(Hb) || [ g])[1] == "file" ? d ? 200 : 404 : c;
+                    c = (j.match(Hb) || ["", g])[1] == "file" ? d ? 200 : 404 : c;
                     a(c == 1223 ? 204 : c, d, e);
                     b.$$completeOutstandingRequest(C)
                 }
@@ -2854,7 +2855,7 @@
                         if (t.readyState == 4) {
                             var a = t.getAllResponseHeaders(),
                                 b = ["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"];
-                            a || (a =  m(b, function(b) {
+                            a || (a = "", m(b, function(b) {
                                 var c = t.getResponseHeader(b);
                                 c && (a += b + ": " + c + "\n")
                             }));
@@ -2882,10 +2883,10 @@
                             minInt: 1,
                             minFrac: 0,
                             maxFrac: 3,
-                            posPre: 
-                            posSuf: 
+                            posPre: "",
+                            posSuf: "",
                             negPre: "-",
-                            negSuf: 
+                            negSuf: "",
                             gSize: 3,
                             lgSize: 3
                         }, {
@@ -2893,7 +2894,7 @@
                             minFrac: 2,
                             maxFrac: 2,
                             posPre: "\u00a4",
-                            posSuf: 
+                            posSuf: "",
                             negPre: "(\u00a4",
                             negSuf: ")",
                             gSize: 3,
@@ -3059,8 +3060,8 @@
             if (isNaN(b) || !isFinite(b)) return "";
             var g = b < 0,
                 b = Math.abs(b),
-                h = b + 
-                f = 
+                h = b + "",
+                f = "",
                 j = [],
                 i = !1;
             if (h.indexOf("e") !== -1) {
@@ -3074,7 +3075,7 @@
                     b = Math.round(b * h) / h,
                     b = ("" + b).split(Xb),
                     h = b[0],
-                    b = b[1] || 
+                    b = b[1] || "",
                     i = 0,
                     k = a.lgSize,
                     l = a.gSize;
@@ -3133,7 +3134,7 @@
             var c = /^(\d{4})-?(\d\d)-?(\d\d)(?:T(\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(Z|([+-])(\d\d):?(\d\d))?)?$/;
             return function(c,
                 e) {
-                var g = 
+                var g = "",
                     h = [],
                     f, j, e = e || "mediumDate",
                     e = b.DATETIME_FORMATS[e] || e;
@@ -3691,7 +3692,7 @@
                 var d = ac.exec(a);
                 d[1] && this.path(decodeURIComponent(d[1]));
                 if (d[2] || d[1]) this.search(d[3] || "");
-                this.hash(d[5] ||  c);
+                this.hash(d[5] || "", c);
                 return this
             },
             protocol: Ha("$$protocol"),
@@ -4195,7 +4196,7 @@
                     })
                 }
             }],
-            zd = kb( !0),
+            zd = kb("", !0),
             Ad = kb("Odd", 0),
             Bd = kb("Even", 1),
             Cd = S({
@@ -4246,7 +4247,7 @@
                     terminal: !0,
                     compile: function(g, h) {
                         var f = h.ngInclude || h.src,
-                            j = h.onload || 
+                            j = h.onload || "",
                             i = h.autoscroll;
                         return function(g, h) {
                             var n = 0,
@@ -4581,12 +4582,12 @@
                                     })
                                 }
                                 p || (t || s === null ? a[""].unshift({
-                                    id: 
-                                    label: 
+                                    id: "",
+                                    label: "",
                                     selected: !v
                                 }) : v || a[""].unshift({
                                     id: "?",
-                                    label: 
+                                    label: "",
                                     selected: !0
                                 }));
                                 x = 0;
@@ -5544,7 +5545,7 @@
             this.yi = a || null;
             this.Mp = !!b;
             this.Wc = new eb;
-            this.S = new ib( void 0);
+            this.S = new ib("", void 0);
             this.S.next = this.S.pb = this.S
         }
         d = hb.prototype;
@@ -6397,12 +6398,12 @@
         jc.prototype.BS = function(a, b) {
             var c = a.length;
             b.push("[");
-            for (var e =  f = 0; f < c; f++) b.push(e), e = a[f], this.Qr(this.Cm ? this.Cm.call(a, String(f), e) : e, b), e = ",";
+            for (var e = "", f = 0; f < c; f++) b.push(e), e = a[f], this.Qr(this.Cm ? this.Cm.call(a, String(f), e) : e, b), e = ",";
             b.push("]")
         };
         jc.prototype.DS = function(a, b) {
             b.push("{");
-            var c = 
+            var c = "",
                 e;
             for (e in a)
                 if (Object.prototype.hasOwnProperty.call(a, e)) {
@@ -6935,7 +6936,7 @@
                     a && a(b)
                 }, this);
                 this.Mx.bh("start_browse", "ar_rq");
-                b ? this.$K.load(b, c) : this.yq.pc && (this.yq.pc("start_browse",  "feed_rs", "feed_r"), this.yq.load({}, c))
+                b ? this.$K.load(b, c) : this.yq.pc && (this.yq.pc("start_browse", "", "feed_rs", "feed_r"), this.yq.load({}, c))
             }, this))
         };
         d.VM = function(a) {
@@ -7106,7 +7107,7 @@
         Rc = xa($c, "Mac");
         xa($c, "Win");
         xa($c, "Linux");
-        Tc() && xa(Tc().appVersion ||  "X11");
+        Tc() && xa(Tc().appVersion || "", "X11");
         var ad = Sc();
         ad && ad.indexOf("Android");
         ad && ad.indexOf("iPhone");
@@ -7118,7 +7119,7 @@
         }
         var cd;
         t: {
-            var dd = 
+            var dd = "",
                 ed;
             if (Wc && h.opera) var fd = h.opera.version,
                 dd = "function" == typeof fd ? fd() : fd;
@@ -7142,13 +7143,13 @@
                 var c = 0;
                 b = pa(String(id)).split(".");
                 for (var e = pa(String(a)).split("."), f = Math.max(b.length, e.length), g = 0; 0 == c && g < f; g++) {
-                    var k = b[g] || 
-                        l = e[g] || 
+                    var k = b[g] || "",
+                        l = e[g] || "",
                         p = RegExp("(\\d*)(\\D*)", "g"),
                         q = RegExp("(\\d*)(\\D*)", "g");
                     do {
-                        var r = p.exec(k) || [  ""],
-                            t = q.exec(l) || [  ""];
+                        var r = p.exec(k) || ["", "", ""],
+                            t = q.exec(l) || ["", "", ""];
                         if (0 == r[0].length && 0 == t[0].length) break;
                         var c = 0 == r[1].length ? 0 : parseInt(r[1], 10),
                             G = 0 == t[1].length ? 0 : parseInt(t[1], 10),
@@ -7926,7 +7927,7 @@
                 case "es":
                 case "it":
                 case "pt":
-                    return new ge( "DD/MM/YYYY");
+                    return new ge("", "DD/MM/YYYY");
                 case "en":
                     switch (b) {
                         case "GB":
@@ -8005,7 +8006,7 @@
         
             if (a.indexOf("[[") === -1) return a;
             
-            var b =  c, e = 0;
+            var b = "", c, e = 0;
             
             do {
                 c = a.indexOf("[[", e);
@@ -8474,7 +8475,7 @@
             "tv" === this.$e.toLowerCase() ? this.Fj = "tv" : this.Lm || (this.Fj = "desktop")
         };
         d.BN = function() {
-            if (this.ja = v("devicePlugin") ? document.getElementById("devicePlugin") : "devicePlugin") this.reversedSelectionKeys = !!this.ja && void 0 !== this.ja.crossMeansAdvance && !this.ja.crossMeansAdvance, this.Vi = this.ja.psnOnlineName ? this.ja.psnOnlineName :  this.Ui = this.ja.psnAvatarURL ? this.ja.psnAvatarURL :  this.es = s(this.ja.licenseArea) ? this.ja.licenseArea : -1
+            if (this.ja = v("devicePlugin") ? document.getElementById("devicePlugin") : "devicePlugin") this.reversedSelectionKeys = !!this.ja && void 0 !== this.ja.crossMeansAdvance && !this.ja.crossMeansAdvance, this.Vi = this.ja.psnOnlineName ? this.ja.psnOnlineName : "", this.Ui = this.ja.psnAvatarURL ? this.ja.psnAvatarURL : "", this.es = s(this.ja.licenseArea) ? this.ja.licenseArea : -1
         };
         d.CN = function() {
             var a = [],
@@ -8496,7 +8497,7 @@
         };
         d.zN = function() {
             if (this.Gg && (this.Gg.search || this.Gg.hash)) {
-                var a = this.Gg.search || 
+                var a = this.Gg.search || "",
                     a = a + (this.Gg.hash || ""),
                     a = a.replace(/\#[^\?]*\??/, "&");
                 this.gT(a)
@@ -8657,7 +8658,7 @@
             this.g.VK_STOP && b.push(" VK_STOP=" + this.g.VK_STOP);
             0 < b.length && (a.Browser += " with key map" + b.join());
             this.cj && (a.OS = this.cj, this.bj && (a.OS += " (" + this.bj + ")"));
-            var b = 
+            var b = "",
                 c;
             for (c in sb) this.Ac(sb[c]) && (b += sb[c].name + ", ");
             a["Active TV Experiments"] = b || "None";
@@ -8998,7 +8999,7 @@
         };
         d.remove = function(a, b, c) {
             var e = this.ET(a);
-            this.Br(a,  0, b, c);
+            this.Br(a, "", 0, b, c);
             return e
         };
         d.Ab = function() {
@@ -9234,7 +9235,7 @@
         z(Ye, Cc);
         Ye.prototype.load = function() {
             this.clear();
-            var a = Gc(this.FL,   this.Fq.currentVideo.videoId, {}, "postplaytile"),
+            var a = Gc(this.FL, "", "", this.Fq.currentVideo.videoId, {}, "postplaytile"),
                 b = this.Fq.Wo();
             if (b) {
                 var c = new Xe(b.Ia, b.serviceQuery, b.eb);
@@ -9283,7 +9284,7 @@
         }
         z(cf, Cc);
         cf.prototype.load = function() {
-            this.rows.push(Ec(this.ZU,  "icon-search"))
+            this.rows.push(Ec(this.ZU, "", "icon-search"))
         };
         cf.$inject = ["searchService"];
         var df = {
@@ -10617,11 +10618,11 @@
         d.eT = function(a) {
             return w(function(b) {
                 this.Nw = !1;
-                this.query === a && (b.serviceQuery = a, b.title = b.r() ? this.AJ + ' "' + a + '"' :  this.ul = b, this.Aa("results:changed", b))
+                this.query === a && (b.serviceQuery = a, b.title = b.r() ? this.AJ + ' "' + a + '"' : "", this.ul = b, this.Aa("results:changed", b))
             }, this)
         };
         d.ic = function(a, b, c) {
-            a != this.query && (a && (a = a.replace("\n", "")), this.query = (a = this.vL.tP(a) ? "" : a) ||  this.jq(), this.tk() || this.Fz(), this.uP(), c || this.oP(), b || this.pP(), this.sL.start())
+            a != this.query && (a && (a = a.replace("\n", "")), this.query = (a = this.vL.tP(a) ? "" : a) || "", this.jq(), this.tk() || this.Fz(), this.uP(), c || this.oP(), b || this.pP(), this.sL.start())
         };
         d.zy = function(a) {
             this.ic(this.query + a)
@@ -11267,7 +11268,7 @@
                 g = e.substr(2);
             try {
                 var k = this.RP.get(f),
-                    l = Ec(k, c ||  this.WT(e, g), g);
+                    l = Ec(k, c || "", this.WT(e, g), g);
                 a.push(l)
             } catch (p) {}
         };
@@ -12475,7 +12476,7 @@
             return this.mode() === a
         };
         bh.prototype.Op = function() {
-            var a = this.state() || 
+            var a = this.state() || "",
                 b = this.mode() || "";
             return {
                 state: a,
@@ -12583,7 +12584,7 @@
                     }, this);
                     0 == --e && b(Oa(c))
                 }, this);
-            this.Cu.pc("start_browse",  "us_rs", "us_r");
+            this.Cu.pc("start_browse", "", "us_rs", "us_r");
             var g = w(function(a, b) {
                 var c = 50 * a;
                 b && c > Math.min(b.dh, 100) ? f(b, this.zo, "displayName", 1, function(a) {
@@ -12596,19 +12597,19 @@
                 }))
             }, this);
             g(0);
-            this.Bu.pc("start_browse",  "up_rs", "up_r");
+            this.Bu.pc("start_browse", "", "up_rs", "up_r");
             this.Bu.Qa("default",
                 w(function(a) {
                     f(a, this.oF, "title", 2, function() {
                         return "icon-playlist"
                     })
                 }, this));
-            this.Eu.pc("start_browse",  "feed_rs", "feed_r");
+            this.Eu.pc("start_browse", "", "feed_rs", "feed_r");
             this.Eu.load({}, w(function(a) {
                 c[4] = a;
                 0 == --e && b(Oa(c))
             }, this));
-            this.Au.pc("start_browse",  "si_rs", "si_r");
+            this.Au.pc("start_browse", "", "si_rs", "si_r");
             this.Au.load({
                 query: "default",
                 type: "channel"
@@ -13170,7 +13171,7 @@
 
         function jh(a, b) {
             var c;
-            a instanceof jh ? (this.Kd = s(b) ? b : a.aJ(), this.Sk(a.gp()), this.Tk(a.hp()), this.Dh(a.ze()), this.Eh(a.Of()), this.Rk(a.Rh()), this.Th(a.bJ().clone()), this.Qk(a.fp())) : a && (c = hf(String(a))) ? (this.Kd = !!b, this.Sk(c[1] ||  !0), this.Tk(c[2] ||  !0), this.Dh(c[3] ||  !0), this.Eh(c[4]), this.Rk(c[5] ||  !0), this.Th(c[6] ||  !0), this.Qk(c[7] ||  !0)) : (this.Kd = !!b, this.ab = new kh(null, null, this.Kd))
+            a instanceof jh ? (this.Kd = s(b) ? b : a.aJ(), this.Sk(a.gp()), this.Tk(a.hp()), this.Dh(a.ze()), this.Eh(a.Of()), this.Rk(a.Rh()), this.Th(a.bJ().clone()), this.Qk(a.fp())) : a && (c = hf(String(a))) ? (this.Kd = !!b, this.Sk(c[1] || "", !0), this.Tk(c[2] || "", !0), this.Dh(c[3] || "", !0), this.Eh(c[4]), this.Rk(c[5] || "", !0), this.Th(c[6] || "", !0), this.Qk(c[7] || "", !0)) : (this.Kd = !!b, this.ab = new kh(null, null, this.Kd))
         }
         d = jh.prototype;
         d.wg = "";
@@ -15245,7 +15246,7 @@
             this.l.debug("open_()");
             this.yh = Math.floor(1E5 * Math.random());
             var a = this.yh++,
-                b = new ui(this, this.l,  a, void 0);
+                b = new ui(this, this.l, "", a, void 0);
             b.Tg(this.Af);
             var c = this.Ho(),
                 e = this.ek.clone();
@@ -15947,7 +15948,7 @@
         function aj(a, b) {
             var c = a.split("#", 2);
             a = c[0];
-            var c = 1 < c.length ? "#" + c[1] : 
+            var c = 1 < c.length ? "#" + c[1] : "",
                 e = a.split("?", 2);
             a = e[0];
             var e = Yi(e[1] || ""),
@@ -16177,7 +16178,7 @@
                     })
                 }, this);
                 this.Yl(w(this.Jy, this, a, b, w(function(c) {
-                    c ? e(c) : (this.qa.rc =  this.Yl(w(this.Jy, this, a, b, e)))
+                    c ? e(c) : (this.qa.rc = "", this.Yl(w(this.Jy, this, a, b, e)))
                 }, this)))
             }
         };
@@ -16212,7 +16213,7 @@
             a = {
                 lounge_token: this.qa.rc,
                 access_type: a ? "permanent" : "temporary",
-                screen_id: this.qa.Tc || 
+                screen_id: this.qa.Tc || "",
                 screen_name: b
             };
             S.eg((PROXY_URL + "/https://www.youtube.com/api/lounge/pairing/get_pairing_code"), {
@@ -16357,7 +16358,7 @@
             if (b) {
                 var e = b.languageCode || "";
                 db(c, {
-                    trackName: b.name || 
+                    trackName: b.name || "",
                     languageCode: e,
                     sourceLanguageCode: b.sourceLanguageCode || e,
                     languageName: b.languageName,
@@ -16405,7 +16406,7 @@
             }, this), this.j.OJ(a, this.Gh || void 0)) : a(!!this.j)
         };
         d.RJ = function() {
-            this.Gh && (this.Gh = null, this.Pf.Kw().rc =  this.Pq(), this.gk())
+            this.Gh && (this.Gh = null, this.Pf.Kw().rc = "", this.Pq(), this.gk())
         };
         d.PJ = function(a) {
             switch (a.action) {
@@ -17688,14 +17689,14 @@
             return this.gc || ""
         };
         d.bf = function(a, b) {
-            return a != this.gc ? (this.gc = a ||  this.wb = a ? 3 : -1, this.hf = 0, this.mf = null, b || this.Fg(), !0) : !1
+            return a != this.gc ? (this.gc = a || "", this.wb = a ? 3 : -1, this.hf = 0, this.mf = null, b || this.Fg(), !0) : !1
         };
         d.kn = function(a, b, c, e, f, g, k, l) {
             this.be && (this.be(), this.be = null);
             if (0 == b.length) this.Ns(), this.fc.st([], n), this.K = null, a([]);
             else {
                 this.ae || (this.ae = Ac(this.fc, "[[YouTube Remote Playlist|Title of playlist created by a user using a remote mobile device (like an Android phone).]]", "icon-remote", "rq"));
-                var p = 
+                var p = "",
                     q = f;
                 f = !1;
                 this.K && this.K === this.ae || (this.K = this.ae, f = !0);
@@ -17704,7 +17705,7 @@
                     var t = this.Ra(),
                         q = t ? b.indexOf(t) : -1;
                     f && t && this.Xd.Hg(this.Xd.currentVideo, this.K)
-                } else 0 > q ? (this.Zd =  this.rf("")) :
+                } else 0 > q ? (this.Zd = "", this.rf("")) :
                     (this.En(), p = b[q], r = this.bf(p, !0) || !!k);
                 k && p && this.H.$C();
                 var G = {};
@@ -18245,7 +18246,7 @@
         };
         Sj.prototype.GR = function(a, b) {
             var c = le(a.body);
-            return c.hasOwnProperty("pairingCode") && c.pairingCode ? (this.wA.Vw(c.pairingCode), this.tA = !0, b.responseCode = 201, b.addHeader("LOCATION", "https://" + a.host + a.path + "/run"), b.mimeType = 'text/plain; charset="utf-8"', b.body =  !0) : !1
+            return c.hasOwnProperty("pairingCode") && c.pairingCode ? (this.wA.Vw(c.pairingCode), this.tA = !0, b.responseCode = 201, b.addHeader("LOCATION", "https://" + a.host + a.path + "/run"), b.mimeType = 'text/plain; charset="utf-8"', b.body = "", !0) : !1
         };
         Sj.$inject = ["environmentModel", "remoteService"];
         String.fromCharCode(160);
@@ -19453,7 +19454,7 @@
                     var f = !0;
                     this.cb() ? this.$i() : this.Lj() && this.dialogModel && this.dialogModel.Qs ? this.activeChildName = "dialog" : this.Zg() ? this.G.isChromelessContext ? (this.je(), this.gn(), this.activeChildName = "dialog") : (this.Ts(), this.je()) : (this.YC(), this.Ig() || (f = !1));
                     if (this.nn()) this.$m(),
-                        this.cb() || (this.searchQuery =  this.watchModel.Us());
+                        this.cb() || (this.searchQuery = "", this.watchModel.Us());
                     else if (this.Ha())
                         if ("browse" !== this.Gc && ("watch" !== e || "browse" === c)) this.watchModel.currentVideo && this.scope.$emit("active-item-changed", this.watchModel.currentVideo);
                         else if ("browse" === this.Gc) {
@@ -19577,7 +19578,7 @@
             this.M(!0, new ac(w(this.dl, this)))
         };
         d.tE = function(a, b) {
-            this.G.Oa ? this.wh( H.b + "/dialogs/eureka_authorization_info.html", "status-dialog") : (this.M(!0, new ac(w(this.dF, this), b, w(this.cF, this))), this.G.loopRows && this.Ut())
+            this.G.Oa ? this.wh("", H.b + "/dialogs/eureka_authorization_info.html", "status-dialog") : (this.M(!0, new ac(w(this.dF, this), b, w(this.cF, this))), this.G.loopRows && this.Ut())
         };
         d.qE = function(a, b, c) {
             a = w(this.PT, this, b, c);
@@ -19748,7 +19749,7 @@
             this.G.loopRows && this.Ut()
         };
         d.zJ = function() {
-            this.wh( H.b + "/dialogs/eureka_player_error_info.html", "status-dialog")
+            this.wh("", H.b + "/dialogs/eureka_player_error_info.html", "status-dialog")
         };
         d.xJ = function() {
             this.M(!1);
@@ -20088,7 +20089,7 @@
         };
         d.qc = function() {
             if (!Z.f.qc.call(this)) return !1;
-            for (var a =  b = Math.min(this.qk ? this.qk : this.data.length, this.data.length), c = 0; c < b; ++c) a += this.Vo(this.data[c].vu, c);
+            for (var a = "", b = Math.min(this.qk ? this.qk : this.data.length, this.data.length), c = 0; c < b; ++c) a += this.Vo(this.data[c].vu, c);
             this.$ && (this.$.$destroy(), this.Lf());
             this.$ = this.scope.$new();
             this.element.html(a);
@@ -20384,7 +20385,7 @@
         };
         d.kN = function(a, b) {
             b = this.Mr(b);
-            var c = this.am.supportsTranslateZ ? "translateZ(0)" : 
+            var c = this.am.supportsTranslateZ ? "translateZ(0)" : "",
                 e = this.am.cssPrefix + "-transform",
                 c = "translateX(" + qe(104 * b, 1) + ") " + c,
                 f = this.am.cssPrefix + "-transition",
@@ -20981,7 +20982,7 @@
             this.data && (this.s(this.KG, this.JG(this.data.model.title)(this.scope)), this.ML(this.data.model.Ja))
         };
         pl.prototype.ML = function(a) {
-            var b = 
+            var b = "",
                 c = "icon";
             a && -1 !== a.indexOf(".jpg") ? b = "url(" + a + ")" : c += " " + a;
             this.gx.className = c;
@@ -21086,7 +21087,7 @@
         };
         d.qc = function() {
             if (!rl.f.qc.call(this)) return !1;
-            for (var a =  b = 0, c = this.data.length; b < c; ++b) a += this.qG(this.data[b], b);
+            for (var a = "", b = 0, c = this.data.length; b < c; ++b) a += this.qG(this.data[b], b);
             this.$u() && (a += this.rG());
             this.$ && (this.$.$destroy(), this.Lf());
             this.$ = this.scope.$new();
@@ -21969,7 +21970,7 @@
                     break;
                 case "hideQrCode":
                     this.La &&
-                        "shown" == this.La.data.Kj && (this.u(this.zj, !1), this.La.data.Kj =  this.La.so = this.$g.setTimeout(w(function() {
+                        "shown" == this.La.data.Kj && (this.u(this.zj, !1), this.La.data.Kj = "", this.La.so = this.$g.setTimeout(w(function() {
                             this.La && "" === this.La.Kj && (this.La = null)
                         }, this), 700));
                     break;
@@ -22096,7 +22097,7 @@
             this.uM.bS(this.Rl, this.langCodePair_, w(this.WR, this))
         };
         d.Oy = function(a) {
-            var b = 
+            var b = "",
                 c = this.Ke.Sy(); - 1 != a.indexOf(c) && (b = a.replace(c, ""));
             return b
         };
@@ -22651,7 +22652,7 @@
         };
         d.mc = function(a) {
             this.kk = !1;
-            (this.su = a) ? (this.Cw(), this.OO = a.videoId, this.MO(), this.NO(), this.LO()) : (this.OO =  this.Kx().nk())
+            (this.su = a) ? (this.Cw(), this.OO = a.videoId, this.MO(), this.NO(), this.LO()) : (this.OO = "", this.Kx().nk())
         };
         d.Xb = function() {
             Ol.f.Xb.call(this);
@@ -22884,7 +22885,7 @@
                     return "watch"
                 }
             });
-            a.when( {
+            a.when("", {
                 state: function() {
                     return -1 < window.location.href.indexOf("pairingCode=") ? "dialog" : "browse"
                 }
@@ -23754,7 +23755,7 @@
             a.value("jsonpBackend", Ql)
         };
         var nm = angular.module("localization", ["ng"]);
-        nm.config(["$provide", function(a, b) {
+        nm.config(["$provide", "$httpProvider", function(a, b) {
             a.service("locale", ne);
             a.value("applicationPath", "");
             a.decorator("$interpolate", ["$delegate", "locale", function(a, e) {
