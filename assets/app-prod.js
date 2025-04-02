@@ -4,9 +4,9 @@
         var currentHost = window.location.hostname;
         var currentPort = window.location.port;
     
-        var APP_URL = "http://" + currentHost + ":" + (currentPort || "8090");  
+        var APP_URL = "https://" + currentHost + ":" + (currentPort || "8090");  
         var APP_HOST =  currentHost;  
-        var PROXY_URL = "http://" + currentHost + ":8070"; 
+        var PROXY_URL = "https://" + currentHost + ":8070"; 
     
         console.log("APP_URL:", APP_URL);
         console.log("PROXY_URL:", PROXY_URL);
@@ -3680,7 +3680,7 @@
             ac = /^([^\?#]*)?(\?([^#]*))?(#(.*))?$/,
             Ic = ac,
             Ib = {
-                http: 80,
+                https: 80,
                 https: 443,
                 ftp: 21
             };
@@ -4808,7 +4808,7 @@
                     $exceptionHandler: Ec,
                     $filter: Rb,
                     $interpolate: Fc,
-                    $http: Wc,
+                    $https: Wc,
                     $httpBackend: Xc,
                     $location: Jc,
                     $log: Kc,
@@ -4832,7 +4832,7 @@
 
     /*
      AngularJS v1.0.8-815053e
-     (c) 2010-2012 Google, Inc. http://angularjs.org
+     (c) 2010-2012 Google, Inc. https://angularjs.org
      License: MIT
     */
     (function(C, d, w) {
@@ -11151,7 +11151,7 @@
             return a.media$group && a.media$group.yt$duration ? parseInt(a.media$group.yt$duration, 10) : 0
         };
         d.qH = function(a) {
-            return a.rel && "http://gdata.youtube.com/schemas/2007#video" === a.rel
+            return a.rel && "https://gdata.youtube.com/schemas/2007#video" === a.rel
         };
         d.pH = function(a) {
             return a && a.link || []
@@ -11559,7 +11559,7 @@
             this.xr();
             this.Xq.post("/o/oauth2/device/code", null, {
                 client_id: "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com",
-                scope: "http://gdata.youtube.com"
+                scope: "https://gdata.youtube.com"
             }, w(function(c) {
                 this.xS(c, a, b)
             }, this))
@@ -11577,7 +11577,7 @@
                 client_id: "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com",
                 client_secret: "SboVhoG9s0rNafixCSGGKXAT",
                 code: a,
-                grant_type: "http://oauth.net/grant_type/device/1.0"
+                grant_type: "https://oauth.net/grant_type/device/1.0"
             };
         
             var f = w(function(e) {
@@ -12086,7 +12086,7 @@
             this.Tv = {
                 exp: w(this.xH, this),
                 f5: w(this.BH, this),
-                http: w(this.CH, this),
+                https: w(this.CH, this),
                 keys: w(this.AH, this),
                 lbl: w(this.yH, this),
                 lclr: w(this.vH, this),
@@ -12124,7 +12124,7 @@
             return !0
         };
         d.CH = function() {
-            this.Qi("https://web.archive.org/web/20130711074931/http://www.youtube.com/tv");
+            this.Qi("https://web.archive.org/web/20130711074931/https://www.youtube.com/tv");
             return !0
         };
         d.AH = function() {
@@ -12283,7 +12283,7 @@
             }
         };
         Yg.prototype.PP = function() {
-            return '<?xml version="1.0" encoding="UTF-8"?> <entry xmlns="http://www.w3.org/2005/Atom" xmlns:yt="https://web.archive.org/web/20130711074931/http://gdata.youtube.com/schemas/2007">{body}</entry>'
+            return '<?xml version="1.0" encoding="UTF-8"?> <entry xmlns="https://www.w3.org/2005/Atom" xmlns:yt="https://web.archive.org/web/20130711074931/https://gdata.youtube.com/schemas/2007">{body}</entry>'
         };
 
         function Zg(a, b, c) {
@@ -16191,7 +16191,7 @@
         };
         
         d.Ml = function(a) {
-            return PROXY_URL + "/http://youtube.com/" + a;
+            return PROXY_URL + "/https://youtube.com/" + a;
         };
         
 
@@ -17343,10 +17343,10 @@
             this.hv = 1;
             this.Qo = 0;
             this.nh = {};
-            t: if (document.implementation && document.implementation.createDocument) g = document.implementation.createDocument("http://www.w3.org/2005/Atom", "feed", null);
+            t: if (document.implementation && document.implementation.createDocument) g = document.implementation.createDocument("https://www.w3.org/2005/Atom", "feed", null);
                 else {
                     if ("undefined" != typeof ActiveXObject && (g = Ej())) {
-                        g.appendChild(g.createNode(1, "feed", "http://www.w3.org/2005/Atom"));
+                        g.appendChild(g.createNode(1, "feed", "https://www.w3.org/2005/Atom"));
                         break t
                     }
                     throw Error("Your browser does not support creating new documents");
@@ -17498,11 +17498,11 @@
                 c = this.createElement("entry"),
                 e = this.createElement("id");
             this.dc.append(e, b);
-            var f = this.createElement("batch:id", "https://web.archive.org/web/20130711074931/http://schemas.google.com/gdata/batch");
+            var f = this.createElement("batch:id", "https://web.archive.org/web/20130711074931/https://schemas.google.com/gdata/batch");
             this.dc.append(f, a);
             a = this.createElement("link");
             Dj(a, {
-                rel: "https://web.archive.org/web/20130711074931/http://schemas.google.com/g/2005#batch",
+                rel: "https://web.archive.org/web/20130711074931/https://schemas.google.com/g/2005#batch",
                 type: "application/atom+xml",
                 href: b
             });
@@ -17516,7 +17516,7 @@
             Id(c);
             var e = this.createElement("id");
             this.dc.append(e, a);
-            var f = this.createElement("batch:operation", "https://web.archive.org/web/20130711074931/http://schemas.google.com/gdata/batch");
+            var f = this.createElement("batch:operation", "https://web.archive.org/web/20130711074931/https://schemas.google.com/gdata/batch");
             Dj(f, {
                 type: "query"
             });
@@ -18238,7 +18238,7 @@
         Sj.prototype.FR = function(a, b) {
             var c = this.wA.MS(),
                 e = '<?xml version="1.0" encoding="UTF-8"?><service xmlns="urn:dial-multiscreen-org:schemas:dial"><name>YouTube</name><options allowStop="false" /><state>' + (null != c || this.tA ? "running" : "stopped") + "</state>";
-            null != c && (e += '<additionalData xmlns="https://web.archive.org/web/20130711074931/http://www.youtube.com/dial"><screenId>' + c + "</screenId></additionalData>");
+            null != c && (e += '<additionalData xmlns="https://web.archive.org/web/20130711074931/https://www.youtube.com/dial"><screenId>' + c + "</screenId></additionalData>");
             b.mimeType = 'text/xml; charset="utf-8"';
             b.responseCode = 200;
             b.body = e + "</service>";
@@ -18246,7 +18246,7 @@
         };
         Sj.prototype.GR = function(a, b) {
             var c = le(a.body);
-            return c.hasOwnProperty("pairingCode") && c.pairingCode ? (this.wA.Vw(c.pairingCode), this.tA = !0, b.responseCode = 201, b.addHeader("LOCATION", "http://" + a.host + a.path + "/run"), b.mimeType = 'text/plain; charset="utf-8"', b.body = "", !0) : !1
+            return c.hasOwnProperty("pairingCode") && c.pairingCode ? (this.wA.Vw(c.pairingCode), this.tA = !0, b.responseCode = 201, b.addHeader("LOCATION", "https://" + a.host + a.path + "/run"), b.mimeType = 'text/plain; charset="utf-8"', b.body = "", !0) : !1
         };
         Sj.$inject = ["environmentModel", "remoteService"];
         String.fromCharCode(160);
@@ -23198,7 +23198,7 @@
                     name: "subscribeService",
                     httpMethod: "post",
                     path: "/users/default/subscriptions",
-                    template: '<category scheme="https://web.archive.org/web/20130711074931/http://gdata.youtube.com/schemas/2007/subscriptiontypes.cat" term="channel"/><yt:username>{channelName}</yt:username>'
+                    template: '<category scheme="https://web.archive.org/web/20130711074931/https://gdata.youtube.com/schemas/2007/subscriptiontypes.cat" term="channel"/><yt:username>{channelName}</yt:username>'
                 }, {
                     name: "unsubscribeService",
                     httpMethod: "delete",
@@ -23838,7 +23838,7 @@
             a.put(H.b + "/dialogs/flag_claim.html", '<div class="flag-claim">  <div class="metadata">    <span class="text"></span>    <div class="url"></div>  </div>  <div class="copyright-infringment">    [[<div class="subtitle">Infringes my copyright</div> youtube.com/t/dmca_policy <div class="email">or email</div> copyright@youtube.com|Provides a way, via email or web site, to claim that a video infringes the current user\'s copyright.]]  </div>  <div class="privacy-invasion">    [[<div class="subtitle">Invades my privacy</div> youtube.com/t/privacy_guidelines|Provides a way to claim, via email or web site, that a given video invades the current user\'s privacy.]]  </div></div>');
             a.put(H.b + "/dialogs/flag_options.html", '<div class="flag-list-container">  <yt:list class="flag-list" data="flag.flagData[0]" item-renderer="yt:button" activate-when="flag.activeIndexEquals(0)" active-index="flag.activeItemIndex"></yt:list>  <yt:list class="flag-list" data="flag.flagData[1]" item-renderer="yt:button" activate-when="flag.activeIndexEquals(1)" active-index="flag.activeItemIndex"></yt:list></div>');
             a.put(H.b + "/dialogs/flag_video.html", '<div class="flag-video">  [[Visit this video on your computer or laptop and click the flag icon to submit a claim:|Provides a URL which a user can access in order to flag the video as inappropriate. Followed by actual URL.]]  <span class="url"></span></div><div class="flag-example"></div>');
-            a.put(H.b + "/dialogs/kenko_warning.html", '\x3c!--  Kenko is a health warning required for PS3 devices licensed in JAPAN.  - The first warning is about flashing lights and seizures.  - The second warning is about fatigue and pain.  - The third warning is about limiting exposure of young children to 3D content.  - The last warning is about sleep deprivation.//--\x3e<div>  <div id="kenko">    <div>      <p><div class="warning"></div>\u8b66\u544a</p>      <p>\u5149\u306e\u523a\u6fc0\u306b\u3088\u3063\u3066\u5f15\u304d\u8d77\u3053\u3055\u308c\u308b\u767a\u4f5c\u306b\u3064\u3044\u3066</p>      <p>\u70b9\u6ec5\u3092\u7e70\u308a\u8fd4\u3059\u753b\u9762\u3084\u3001\u305d\u306e\u4ed6\u306e\u5149\u306e\u523a\u6fc0\u306b\u3088\u3063\u3066\u3001\u307e\u308c\u306b\u3001\u76ee\u306e\u75db\u307f\u3001\u8996\u899a\u7570\u5e38\u3001\u504f\u982d\u75db\u3001\u3051\u3044\u308c\u3093\u3084\u610f\u8b58\u969c\u5bb3\uff08\u5931\u795e\u306a\u3069\uff09\u306a\u3069\u306e\u75c7\u72b6\uff08\u5149\u611f\u53d7\u6027\u767a\u4f5c\uff09\u304c\u8d77\u304d\u308b\u3053\u3068\u304c\u3042\u308a\u307e\u3059\u3002\u3053\u3046\u3057\u305f\u75c7\u72b6\u306e\u3042\u308b\u65b9\u306f\u3001\u4e8b\u524d\u306b\u5fc5\u305a\u533b\u5e2b\u306b\u76f8\u8ac7\u3057\u3066\u304f\u3060\u3055\u3044</p>    </div>    <div>      <p><div class="warning"></div>\u6ce8\u610f</p>      <p>\u3053\u3093\u306a\u3068\u304d\u306f\u3059\u3050\u306b\u30d7\u30ec\u30a4\u3092\u4e2d\u6b62\u3059\u308b</p>      <p>\u4e0a\u8a18\u306e\u75c7\u72b6\u306b\u52a0\u3048\u3001\u982d\u75db\u3001\u3081\u307e\u3044\u3001\u5410\u304d\u6c17\u3001\u75b2\u52b4\u611f\u3001\u4e57\u308a\u7269\u9154\u3044\u306b\u4f3c\u305f\u75c7\u72b6\u306a\u3069\u3092\u611f\u3058\u305f\u3068\u304d\u3084\u3001\u76ee\u3001\u8033\u3001\u624b\u3001\u8155\u3001\u8db3\u306a\u3069\u3001\u8eab\u4f53\u306e\u4e00\u90e8\u306b\u4e0d\u5feb\u611f\u3084\u75db\u307f\u3092\u611f\u3058\u305f\u3068\u304d\u306f\u3001\u3059\u3050\u306b\u30d7\u30ec\u30a4\u3092\u4e2d\u6b62\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u30d7\u30ec\u30a4\u3092\u4e2d\u6b62\u3057\u3066\u3082\u6cbb\u3089\u306a\u3044\u3068\u304d\u306f\u3001\u533b\u5e2b\u306e\u8a3a\u5bdf\u3092\u53d7\u3051\u3066\u304f\u3060\u3055\u3044\u3002</p>    </div>    <div>      <p>3D\u6620\u50cf\u30013D\u7acb\u4f53\u8996\u30b2\u30fc\u30e0\u306b\u3064\u3044\u3066</p>    3D\u6620\u50cf\u306e\u898b\u3048\u65b9\u306b\u306f\u500b\u4eba\u5dee\u304c\u3042\u308a\u307e\u3059\u3002\u9055\u548c\u611f\u3092\u611f\u3058\u305f\u308a\u3001\u7acb\u4f53\u306b\u898b\u3048\u306a\u3044\u5834\u5408\u306f\u30013D\u6a5f\u80fd\u306e\u3054\u4f7f\u7528\u3092\u304a\u63a7\u3048\u304f\u3060\u3055\u3044\u3002\u6700\u65b0\u60c5\u5831\u306b\u3064\u3044\u3066\u306f\u4e0b\u8a18URL\u3092\u3054\u89a7\u304f\u3060\u3055\u3044\u3002    http://www.jp.playstation.com/support/</p>      <p>\u306a\u304a\u3001\u304a\u5b50\u3055\u307e\uff08\u7279\u306b6\u6b73\u672a\u6e80\u306e\u5b50\uff09\u306e\u8996\u899a\u306f\u767a\u9054\u6bb5\u968e\u306b\u3042\u308a\u307e\u3059\u3002\u304a\u5b50\u3055\u307e\u304c3D\u6620\u50cf\u3092\u8996\u8074\u3057\u305f\u308a\u30013D\u7acb\u4f53\u8996\u30b2\u30fc\u30e0\u3092\u30d7\u30ec\u30a4\u3059\u308b\u524d\u306b\u3001\u5c0f\u5150\u79d1\u3084\u773c\u79d1\u306a\u3069\u306e\u533b\u5e2b\u306b\u3054\u76f8\u8ac7\u3044\u305f\u3060\u304f\u3053\u3068\u3092\u304a\u3059\u3059\u3081\u3057\u307e\u3059\u3002</p>    </div>    <div>      <p>\u30b3\u30f3\u30c8\u30ed\u30fc\u30e9\u306e\u632f\u52d5\u6a5f\u80fd\u306b\u5bfe\u5fdc\u3057\u305f\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2\u306b\u3064\u3044\u3066</p>      <p>\u632f\u52d5\u969c\u5bb3\u306e\u3042\u308b\u65b9\u306f\u3001\u30d0\u30a4\u30d6\u30ec\u30fc\u30b7\u30e7\u30f3\uff08\u632f\u52d5\uff09\u6a5f\u80fd\u3092\u4f7f\u7528\u3057\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002</p>      <p>\u203b\u632f\u52d5\u6a5f\u80fd\u306e\u5165\uff0f\u5207\u306f\u3001\u30b3\u30f3\u30c8\u30ed\u30fc\u30e9\u306ePS\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u8868\u793a\u3055\u308c\u308b\u30e1\u30cb\u30e5\u30fc\u304b\u3089\u8a2d\u5b9a\u3067\u304d\u307e\u3059\u3002</p>    </div>    <div>      <ul class="ul">        <li>\u30d7\u30ec\u30a4\u3059\u308b\u3068\u304d\u306f\u3001\u90e8\u5c4b\u3092\u660e\u308b\u304f\u3057\u3001\u3067\u304d\u308b\u3060\u3051\u753b\u9762\u304b\u3089\u96e2\u308c\u3066\u304f\u3060\u3055\u3044\u3002</li>        <li>\u75b2\u308c\u3066\u3044\u308b\u3068\u304d\u3084\u7761\u7720\u4e0d\u8db3\u306e\u3068\u304d\u306f\u3001\u30d7\u30ec\u30a4\u3092\u907f\u3051\u3066\u304f\u3060\u3055\u3044\u3002</li>        <li>\u30d7\u30ec\u30a4\u3059\u308b\u3068\u304d\u306f\u5065\u5eb7\u306e\u305f\u3081\u30011\u6642\u9593\u3054\u3068\u306b15\u5206\u7a0b\u5ea6\u306e\u4f11\u61a9\u3092\u53d6\u3063\u3066\u304f\u3060\u3055\u3044\u3002</li>        <li>\u30d7\u30ec\u30a4\u4e2d\u306b\u4f53\u8abf\u304c\u60aa\u304f\u306a\u3063\u305f\u3089\u3001\u3059\u3050\u306b\u30d7\u30ec\u30a4\u3092\u3084\u3081\u3066\u304f\u3060\u3055\u3044\u3002</li>      </ul>    </div>  </div></div>');
+            a.put(H.b + "/dialogs/kenko_warning.html", '\x3c!--  Kenko is a health warning required for PS3 devices licensed in JAPAN.  - The first warning is about flashing lights and seizures.  - The second warning is about fatigue and pain.  - The third warning is about limiting exposure of young children to 3D content.  - The last warning is about sleep deprivation.//--\x3e<div>  <div id="kenko">    <div>      <p><div class="warning"></div>\u8b66\u544a</p>      <p>\u5149\u306e\u523a\u6fc0\u306b\u3088\u3063\u3066\u5f15\u304d\u8d77\u3053\u3055\u308c\u308b\u767a\u4f5c\u306b\u3064\u3044\u3066</p>      <p>\u70b9\u6ec5\u3092\u7e70\u308a\u8fd4\u3059\u753b\u9762\u3084\u3001\u305d\u306e\u4ed6\u306e\u5149\u306e\u523a\u6fc0\u306b\u3088\u3063\u3066\u3001\u307e\u308c\u306b\u3001\u76ee\u306e\u75db\u307f\u3001\u8996\u899a\u7570\u5e38\u3001\u504f\u982d\u75db\u3001\u3051\u3044\u308c\u3093\u3084\u610f\u8b58\u969c\u5bb3\uff08\u5931\u795e\u306a\u3069\uff09\u306a\u3069\u306e\u75c7\u72b6\uff08\u5149\u611f\u53d7\u6027\u767a\u4f5c\uff09\u304c\u8d77\u304d\u308b\u3053\u3068\u304c\u3042\u308a\u307e\u3059\u3002\u3053\u3046\u3057\u305f\u75c7\u72b6\u306e\u3042\u308b\u65b9\u306f\u3001\u4e8b\u524d\u306b\u5fc5\u305a\u533b\u5e2b\u306b\u76f8\u8ac7\u3057\u3066\u304f\u3060\u3055\u3044</p>    </div>    <div>      <p><div class="warning"></div>\u6ce8\u610f</p>      <p>\u3053\u3093\u306a\u3068\u304d\u306f\u3059\u3050\u306b\u30d7\u30ec\u30a4\u3092\u4e2d\u6b62\u3059\u308b</p>      <p>\u4e0a\u8a18\u306e\u75c7\u72b6\u306b\u52a0\u3048\u3001\u982d\u75db\u3001\u3081\u307e\u3044\u3001\u5410\u304d\u6c17\u3001\u75b2\u52b4\u611f\u3001\u4e57\u308a\u7269\u9154\u3044\u306b\u4f3c\u305f\u75c7\u72b6\u306a\u3069\u3092\u611f\u3058\u305f\u3068\u304d\u3084\u3001\u76ee\u3001\u8033\u3001\u624b\u3001\u8155\u3001\u8db3\u306a\u3069\u3001\u8eab\u4f53\u306e\u4e00\u90e8\u306b\u4e0d\u5feb\u611f\u3084\u75db\u307f\u3092\u611f\u3058\u305f\u3068\u304d\u306f\u3001\u3059\u3050\u306b\u30d7\u30ec\u30a4\u3092\u4e2d\u6b62\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u30d7\u30ec\u30a4\u3092\u4e2d\u6b62\u3057\u3066\u3082\u6cbb\u3089\u306a\u3044\u3068\u304d\u306f\u3001\u533b\u5e2b\u306e\u8a3a\u5bdf\u3092\u53d7\u3051\u3066\u304f\u3060\u3055\u3044\u3002</p>    </div>    <div>      <p>3D\u6620\u50cf\u30013D\u7acb\u4f53\u8996\u30b2\u30fc\u30e0\u306b\u3064\u3044\u3066</p>    3D\u6620\u50cf\u306e\u898b\u3048\u65b9\u306b\u306f\u500b\u4eba\u5dee\u304c\u3042\u308a\u307e\u3059\u3002\u9055\u548c\u611f\u3092\u611f\u3058\u305f\u308a\u3001\u7acb\u4f53\u306b\u898b\u3048\u306a\u3044\u5834\u5408\u306f\u30013D\u6a5f\u80fd\u306e\u3054\u4f7f\u7528\u3092\u304a\u63a7\u3048\u304f\u3060\u3055\u3044\u3002\u6700\u65b0\u60c5\u5831\u306b\u3064\u3044\u3066\u306f\u4e0b\u8a18URL\u3092\u3054\u89a7\u304f\u3060\u3055\u3044\u3002    https://www.jp.playstation.com/support/</p>      <p>\u306a\u304a\u3001\u304a\u5b50\u3055\u307e\uff08\u7279\u306b6\u6b73\u672a\u6e80\u306e\u5b50\uff09\u306e\u8996\u899a\u306f\u767a\u9054\u6bb5\u968e\u306b\u3042\u308a\u307e\u3059\u3002\u304a\u5b50\u3055\u307e\u304c3D\u6620\u50cf\u3092\u8996\u8074\u3057\u305f\u308a\u30013D\u7acb\u4f53\u8996\u30b2\u30fc\u30e0\u3092\u30d7\u30ec\u30a4\u3059\u308b\u524d\u306b\u3001\u5c0f\u5150\u79d1\u3084\u773c\u79d1\u306a\u3069\u306e\u533b\u5e2b\u306b\u3054\u76f8\u8ac7\u3044\u305f\u3060\u304f\u3053\u3068\u3092\u304a\u3059\u3059\u3081\u3057\u307e\u3059\u3002</p>    </div>    <div>      <p>\u30b3\u30f3\u30c8\u30ed\u30fc\u30e9\u306e\u632f\u52d5\u6a5f\u80fd\u306b\u5bfe\u5fdc\u3057\u305f\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2\u306b\u3064\u3044\u3066</p>      <p>\u632f\u52d5\u969c\u5bb3\u306e\u3042\u308b\u65b9\u306f\u3001\u30d0\u30a4\u30d6\u30ec\u30fc\u30b7\u30e7\u30f3\uff08\u632f\u52d5\uff09\u6a5f\u80fd\u3092\u4f7f\u7528\u3057\u306a\u3044\u3067\u304f\u3060\u3055\u3044\u3002</p>      <p>\u203b\u632f\u52d5\u6a5f\u80fd\u306e\u5165\uff0f\u5207\u306f\u3001\u30b3\u30f3\u30c8\u30ed\u30fc\u30e9\u306ePS\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u8868\u793a\u3055\u308c\u308b\u30e1\u30cb\u30e5\u30fc\u304b\u3089\u8a2d\u5b9a\u3067\u304d\u307e\u3059\u3002</p>    </div>    <div>      <ul class="ul">        <li>\u30d7\u30ec\u30a4\u3059\u308b\u3068\u304d\u306f\u3001\u90e8\u5c4b\u3092\u660e\u308b\u304f\u3057\u3001\u3067\u304d\u308b\u3060\u3051\u753b\u9762\u304b\u3089\u96e2\u308c\u3066\u304f\u3060\u3055\u3044\u3002</li>        <li>\u75b2\u308c\u3066\u3044\u308b\u3068\u304d\u3084\u7761\u7720\u4e0d\u8db3\u306e\u3068\u304d\u306f\u3001\u30d7\u30ec\u30a4\u3092\u907f\u3051\u3066\u304f\u3060\u3055\u3044\u3002</li>        <li>\u30d7\u30ec\u30a4\u3059\u308b\u3068\u304d\u306f\u5065\u5eb7\u306e\u305f\u3081\u30011\u6642\u9593\u3054\u3068\u306b15\u5206\u7a0b\u5ea6\u306e\u4f11\u61a9\u3092\u53d6\u3063\u3066\u304f\u3060\u3055\u3044\u3002</li>        <li>\u30d7\u30ec\u30a4\u4e2d\u306b\u4f53\u8abf\u304c\u60aa\u304f\u306a\u3063\u305f\u3089\u3001\u3059\u3050\u306b\u30d7\u30ec\u30a4\u3092\u3084\u3081\u3066\u304f\u3060\u3055\u3044\u3002</li>      </ul>    </div>  </div></div>');
             a.put(H.b + "/dialogs/login_info.html", '<div>  <div class="login-guest-info">    <ul class="login-instructions">      <li>[[<h4>Go To</h4> <div class="activate-url">www.youtube.com/activate</div>|Step that a user needs to perform in order to pair her YouTube account with the application.]]</li>      <li id="pairing-code-container"></li>    </ul>  </div></div>');
             a.put(H.b + "/dialogs/logout_info.html", '<div>  <div class="logout-authenticated-info">    <div class="login-user-icon"></div>    <div class="login-user-info">      <h3 class="display-name"></h3>      <div class="platform-container">        <div class="platform-user-icon"></div>        <span class="platform-user-name"></span>      </div>      <div class="signed-in-message"></div>    </div>  </div></div>');
             a.put(H.b + "/dialogs/network_error_info.html", "<div>[[A network error has occurred. Please check your network connection.|Dialog subtitle telling user that a network error has occurred, and asking the user to check their network connection]]</div>");
@@ -23850,7 +23850,7 @@
             a.put(H.b + "/dialogs/shiyojo_warning.html", '\x3c!--  Shiyojo is a warning required for PS3 devices licensed in Japan.  - This is a PS3 only app.  - When displayed in a TV other than an LCD TV an afterimage may be burned  into the device if the game/app is left paused for too long.//--\x3e<div id="shiyojo">  <ul>    <li>\u3053\u306e\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2\u306fPlayStation&#174;3\u5c02\u7528\u3067\u3059\u3002</li>    <li>PlayStation&#174;3\u3092\u30d7\u30e9\u30ba\u30de\u30c6\u30ec\u30d3\u3084\u3001\u6db2\u6676\u65b9\u5f0f\u4ee5\u5916\u306e\u30d7\u30ed\u30b8\u30a7\u30af\u30b7\u30e7\u30f3\u30c6\u30ec\u30d3\uff08\u30b9\u30af\u30ea\u30fc\u30f3\u6295\u5f71\u65b9\u5f0f\u30c6\u30ec\u30d3\uff09\u306b\u3064\u306a\u3050\u3068\u3001\u753b\u50cf\u306e\u713c\u304d\u4ed8\u304d\uff08\u6b8b\u50cf\u6620\u50cf\uff09\u304c\u8d77\u3053\u308b\u3053\u3068\u304c\u3042\u308a\u307e\u3059\u3002\u7279\u306b\u3001\u9759\u6b62\u753b\u3092\u30c6\u30ec\u30d3\u753b\u9762\u306b\u8868\u793a\u3057\u305f\u307e\u307e\u9577\u6642\u9593\u653e\u7f6e\u3059\u308b\u3068\u3001\u713c\u304d\u4ed8\u304d\u304c\u8d77\u3053\u308a\u3084\u3059\u304f\u306a\u308a\u307e\u3059\u3002</li>    <li>PlayStation&#174;3\u306e\u30b7\u30b9\u30c6\u30e0\u30bd\u30d5\u30c8\u30a6\u30a7\u30a2\u306f\u3001\u5e38\u306b\u6700\u65b0\u306e\u3082\u306e\u306b\u30d0\u30fc\u30b8\u30e7\u30f3\u30a2\u30c3\u30d7\u3057\u3066\u304a\u4f7f\u3044\u304f\u3060\u3055\u3044\u3002</li>  </ul>  <div class="small-print">    "<div class="playstation-logo"></div>", "PlayStation", "<div class="ps3-logo"></div>", "PSN logo", "DUALSHOCK" and "SIXAXIS" are registered trademarks of Sony Computer Entertainment Inc.    <p>"XMB" and "\u30af\u30ed\u30b9\u30e1\u30c7\u30a3\u30a2\u30d0\u30fc" are trademarks of Sony Corporation and Sony Computer Entertainment Inc.</p>    <p>Library programs &#169;Sony Computer Entertainment Inc.</p>    "<div class="playstation-logo"></div>"&#169;1994 Sony Computer Entertainment Inc.</p>  <div></div>');
             a.put(H.b + "/dialogs/signed_out_info.html", "<div>  [[You have been signed out by the application.|Message that tells the user that they have been signed out by the application]]</div><div>  [[Would you like to sign in again?|Message that asks the user if they would like to sign in again]]</div>");
             a.put(H.b + "/dialogs/simple_dialog.html", '<div ng-include="dialog.data.contentUrl"></div>');
-            a.put(H.b + "/dialogs/tos_info.html", "<div>[[To view the Terms of Service go to:|Dialog subtitle telling user to go to the following URL to view youtube terms of service.]]</div><div class='url'>http://www.youtube.com/terms</div><div>[[To view the Privacy Policy go to:|Dialog subtitle telling user to go to the following URL to view youtube privacy policy document]]</div><div class='url'>http://www.youtube.com/privacy</div>");
+            a.put(H.b + "/dialogs/tos_info.html", "<div>[[To view the Terms of Service go to:|Dialog subtitle telling user to go to the following URL to view youtube terms of service.]]</div><div class='url'>https://www.youtube.com/terms</div><div>[[To view the Privacy Policy go to:|Dialog subtitle telling user to go to the following URL to view youtube privacy policy document]]</div><div class='url'>https://www.youtube.com/privacy</div>");
             a.put(H.b + "/feed_icon.html", '<div class="feed-icon">  <div class="icon"></div>  <h2></h2></div>');
             a.put(H.b + "/grid.html", '<div class="grid-content"></div>');
             a.put(H.b + "/keyboard.html", '<div>  <div id="transliteration-container">    <yt:transliteration id="transliteration" lang-code-pair="keyboard.langCodePair"></yt:transliteration>  </div>  <yt:grid id="keyboard-grid" item-renderer="yt:lettertile" loop="true" consume-keys="!keyboard.isLetterSuggestVisible()" repeat-rate="keyboard.getKeyRepeatRate()"></yt:grid>  <yt:lettersuggestlist id="letter-suggest" class="letter-suggest" item-renderer="yt:lettertile" orientation="vertical"></yt:lettersuggestlist></div>');
