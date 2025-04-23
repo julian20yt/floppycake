@@ -749,7 +749,7 @@
                     }
                 },
                 l = g(k, function() {
-                    throw Error("Unknown provider: " + j.join(" <- "));
+                    
                 }),
                 n = {},
                 o = n.$injector = g(n, function(a) {
