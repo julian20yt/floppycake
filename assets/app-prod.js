@@ -754,7 +754,7 @@
                 n = {},
                 o = n.$injector = g(n, function(a) {
                     a = l.get(a + f);
-                    return o.invoke(a.$get, a)
+                    return o.invoke(a)
                 });
             m(e(b), function(a) {
                 o.invoke(a || C)
