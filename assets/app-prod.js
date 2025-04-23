@@ -637,7 +637,7 @@
                                     p[g[1]].apply(p, g[2])
                                 }
                             } catch (j) {
-                                throw j.message && (j.message += " from " + a), j;
+                                
                             }
                         } else if (H(a)) try {
                         b.push(l.invoke(a))
